@@ -7,6 +7,12 @@ pip install -r requirements.txt
 python safety_zone_agent.py --source 0 --zone "160,130 500,110 560,400 120,420"
 ```
 
+Draw the zone on the first frame:
+
+```bash
+python safety_zone_agent.py --source 0 --draw-zone
+```
+
 Use a video file instead of a webcam:
 
 ```bash

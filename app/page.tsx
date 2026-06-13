@@ -23,12 +23,12 @@ export default function Home() {
         <article className="step">
           <span>01</span>
           <h2>Camera</h2>
-          <p>Webcam or IP camera frames are processed on the local edge machine.</p>
+          <p>The Vercel page opens a browser webcam; the Python edge agent can also process local webcam or video frames.</p>
         </article>
         <article className="step">
           <span>02</span>
           <h2>Supervision</h2>
-          <p>YOLO detections become `sv.Detections`, then ByteTrack and PolygonZone handle IDs and zone occupancy.</p>
+          <p>The browser mode alerts on motion in a drawn zone; the local edge agent uses YOLO, `sv.Detections`, ByteTrack, and PolygonZone.</p>
         </article>
         <article className="step">
           <span>03</span>

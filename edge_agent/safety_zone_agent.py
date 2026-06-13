@@ -77,6 +77,61 @@ def parse_zone(points: str) -> np.ndarray:
     return np.array(parsed_points, dtype=np.int32)
 
 
+def draw_zone_from_frame(frame: np.ndarray) -> np.ndarray:
+    points: list[list[int]] = []
+    window_name = "Draw restricted zone - click points, Enter to lock"
+
+    def on_mouse(event, x, y, _flags, _param):
+        if event == cv2.EVENT_LBUTTONDOWN:
+            points.append([x, y])
+
+    cv2.namedWindow(window_name)
+    cv2.setMouseCallback(window_name, on_mouse)
+
+    while True:
+        preview = frame.copy()
+        for index, point in enumerate(points):
+            cv2.circle(preview, point, 5, (34, 130, 72), -1)
+            cv2.putText(
+                preview,
+                str(index + 1),
+                (point[0] + 8, point[1] - 8),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.5,
+                (34, 130, 72),
+                2,
+                cv2.LINE_AA,
+            )
+        if len(points) > 1:
+            cv2.polylines(preview, [np.array(points, dtype=np.int32)], False, (34, 130, 72), 2)
+        if len(points) > 2:
+            closed = np.array(points, dtype=np.int32)
+            overlay = preview.copy()
+            cv2.fillPoly(overlay, [closed], (34, 130, 72))
+            preview = cv2.addWeighted(overlay, 0.18, preview, 0.82, 0)
+
+        cv2.putText(
+            preview,
+            "Click 3+ points. Enter=lock zone, Backspace=undo, Esc/Q=cancel",
+            (18, 32),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.7,
+            (255, 255, 255),
+            2,
+            cv2.LINE_AA,
+        )
+        cv2.imshow(window_name, preview)
+        key = cv2.waitKey(20) & 0xFF
+        if key in (13, 10) and len(points) >= 3:
+            cv2.destroyWindow(window_name)
+            return np.array(points, dtype=np.int32)
+        if key in (8, 127) and points:
+            points.pop()
+        if key in (27, ord("q")):
+            cv2.destroyWindow(window_name)
+            raise RuntimeError("Zone drawing cancelled")
+
+
 def post_event(webhook_url: str | None, payload: dict) -> None:
     if not webhook_url:
         return
@@ -129,7 +184,8 @@ def run(args: argparse.Namespace) -> None:
     height, width = frame.shape[:2]
     capture.set(cv2.CAP_PROP_POS_FRAMES, 0)
 
-    zone = sv.PolygonZone(polygon=parse_zone(args.zone))
+    zone_polygon = draw_zone_from_frame(frame) if args.draw_zone or not args.zone else parse_zone(args.zone)
+    zone = sv.PolygonZone(polygon=zone_polygon)
     tracker = sv.ByteTrack()
     dwell = DwellState()
     serial_alert = SerialAlert(args.serial_port, args.serial_baudrate)
@@ -226,7 +282,8 @@ def run(args: argparse.Namespace) -> None:
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Physical AI restricted-zone monitor using roboflow/supervision.")
     parser.add_argument("--source", default="0", help="Camera index or video file path.")
-    parser.add_argument("--zone", required=True, help='Polygon points, for example: "160,130 500,110 560,400 120,420".')
+    parser.add_argument("--zone", help='Polygon points, for example: "160,130 500,110 560,400 120,420".')
+    parser.add_argument("--draw-zone", action="store_true", help="Draw the polygon interactively on the first frame.")
     parser.add_argument("--weights", default="yolo11n.pt", help="Ultralytics YOLO weights.")
     parser.add_argument("--confidence", type=float, default=0.35, help="Detection confidence threshold.")
     parser.add_argument("--iou", type=float, default=0.7, help="NMS IoU threshold.")

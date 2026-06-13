@@ -26,14 +26,15 @@ try {
 
   const bodyText = await page.locator("body").innerText();
   assert.match(bodyText, /Physical AI Safety Zone/);
-  assert.match(bodyText, /Live No-Go Zone Monitor/);
+  assert.match(bodyText, /Real-Time Webcam Safety Zone/);
   assert.match(bodyText, /Supervision/);
 
   assert.equal(await page.locator("[data-nextjs-dialog], .vite-error-overlay, #webpack-dev-server-client-overlay").count(), 0);
 
-  await page.getByRole("button", { name: "Pause" }).click();
-  await expectText(page, "Resume");
-  await page.getByRole("button", { name: "Reset" }).click();
+  await page.getByRole("button", { name: "Clear zone" }).click();
+  await expectText(page, "Click 3+ points");
+  await page.getByRole("button", { name: "Use sample zone" }).click();
+  await expectText(page, "Zone locked");
 
   const health = await page.evaluate(async () => {
     const result = await fetch("/api/health");
