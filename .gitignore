@@ -1,0 +1,17 @@
+.next/
+node_modules/
+out/
+coverage/
+.vercel/
+*.log
+*.tsbuildinfo
+__pycache__/
+.pytest_cache/
+.venv/
+venv/
+data/
+*.mp4
+*.avi
+*.mov
+outputs/
+work/

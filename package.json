@@ -1,0 +1,32 @@
+{
+  "name": "physical-ai-safety-zone",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Physical AI safety-zone demo using roboflow/supervision on the edge and a Vercel-hosted control dashboard.",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test tests/*.test.mjs",
+    "e2e": "node tests/e2e.mjs",
+    "verify": "npm run typecheck && npm test && npm run build"
+  },
+  "dependencies": {
+    "next": "latest",
+    "react": "latest",
+    "react-dom": "latest"
+  },
+  "overrides": {
+    "postcss": "^8.5.10"
+  },
+  "devDependencies": {
+    "@types/node": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "playwright": "^1.60.0",
+    "typescript": "latest"
+  }
+}

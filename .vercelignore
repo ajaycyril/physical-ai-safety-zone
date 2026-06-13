@@ -1,0 +1,10 @@
+work
+outputs
+.venv
+venv
+data
+*.mp4
+*.avi
+*.mov
+__pycache__
+.pytest_cache

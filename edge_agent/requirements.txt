@@ -1,0 +1,5 @@
+opencv-python>=4.9.0
+requests>=2.31.0
+supervision>=0.28.0
+ultralytics>=8.3.0
+pyserial>=3.5
