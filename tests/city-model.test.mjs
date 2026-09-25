@@ -1,0 +1,5 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {CityModel} from '../public/room/city-model.js';
+test('counterfactual rollouts do not mutate the operational state',()=>{const m=new CityModel();m.setDemand(8,3);const before=JSON.stringify(m);const p=m.projection();assert.equal(JSON.stringify(m),before);assert.equal(p.horizon,30);assert.equal(p.fixedTrace.length,30);assert.equal(p.adaptiveTrace.length,30);assert.deepEqual(p,m.projection());});
+test('approved response gives pedestrians a protected stage before vehicle release',()=>{const m=new CityModel();m.setDemand(8,3);m.requestPlan();let walked=false,cleared=false;for(let i=0;i<1800;i++){m.tick(.05);if(m.crossers.length){walked=true;assert.ok(!['NS','EW'].includes(m.signal));}if(m.policy==='adaptive'&&m.ewPassed>0)cleared=true;assert.ok(m.cars.every(c=>Number.isFinite(c.p)&&Number.isFinite(c.v)));}assert.ok(walked);assert.ok(cleared);assert.ok(m.changeLog.some(c=>c.to==='ALL RED'));assert.ok(m.changeLog.some(c=>c.to==='CLEARANCE'));});

@@ -1,33 +1,24 @@
 {
   "name": "physical-intelligence-lab",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "type": "module",
-  "description": "A live physical-intelligence control room with browser vision, world state and simulated robotics.",
+  "description": "Camera evidence, world-state forecasts and governed factory and city actions in one readable control room.",
   "scripts": {
-    "dev": "node scripts/prepare-studio.mjs && next dev",
-    "build": "node scripts/prepare-studio.mjs && node --check public/room/studio.js && node --check public/room/facility.js && node --check public/room/perception.js && node --check public/room/vision-worker.js && next build",
+    "dev": "node scripts/prepare-studio.mjs && node scripts/prepare-city.mjs && next dev",
+    "build": "node scripts/prepare-studio.mjs && node scripts/prepare-city.mjs && node --check public/room/studio.js && node --check public/room/facility.js && node --check public/room/perception.js && node --check public/room/vision-worker.js && node --check public/room/city.js && node --check public/room/city-model.js && node --check public/room/city-perception.js && node --check public/room/city-studio.js && node --check public/room/entry.js && next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "test": "node --test tests/*.test.mjs",
-    "e2e": "node tests/control-room-check.mjs",
+    "e2e": "node tests/control-room-check.mjs && node tests/city-check.mjs",
     "verify": "npm run typecheck && npm test && npm run build"
   },
   "dependencies": {
-    "next": "latest",
-    "react": "latest",
-    "react-dom": "latest",
-    "@mujoco/mujoco": "3.13.0",
-    "@mediapipe/tasks-vision": "1.0.1",
-    "three": "0.186.0"
+    "next": "latest", "react": "latest", "react-dom": "latest",
+    "@mujoco/mujoco": "3.13.0", "@mediapipe/tasks-vision": "1.0.1", "three": "0.186.0"
   },
   "overrides": { "postcss": "^8.5.10" },
   "devDependencies": {
-    "@types/node": "latest",
-    "@types/react": "latest",
-    "@types/react-dom": "latest",
-    "playwright": "^1.60.0",
-    "typescript": "latest",
-    "@types/three": "0.186.0"
+    "@types/node": "latest", "@types/react": "latest", "@types/react-dom": "latest", "playwright": "^1.60.0", "typescript": "latest", "@types/three": "0.186.0"
   }
 }
