@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<meta name="theme-color" content="#09080d"/>
+<meta name="description" content="Live Analog-inspired Physical Intelligence prototype: Ana reasoning, Hive orchestration, World Model, robot intelligence routing, edge runtime, safety and robotic simulation."/>
+<meta name="color-scheme" content="dark"/>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="/styles-a.css"/>
+<link rel="stylesheet" href="/styles-b.css"/>
+<link rel="stylesheet" href="/architecture.css"/>
+<link rel="stylesheet" href="/live-system.css"/>
+<title>Live Physical Intelligence System — Analog Product Thesis</title>
+</head>
+<body class="deep-page lab-page">
+<div class="grain" aria-hidden="true"></div>
+<div class="ambient ambient-one" data-parallax="-0.05" aria-hidden="true"></div>
+<div class="ambient ambient-two" data-parallax="0.04" aria-hidden="true"></div>
+
+<header class="site-header is-scrolled" data-header>
+<a class="brand" href="/analog-product-thesis.html#system" aria-label="Back to architecture">
+<span class="brand-mark" aria-hidden="true"><i></i><i></i></span>
+<span class="brand-copy"><strong>AJAY CYRIL</strong><small>ANALOG PRODUCT THESIS / LIVE SYSTEM</small></span>
+</a>
+<nav class="desktop-nav" aria-label="Prototype navigation">
+<a href="/analog-product-thesis.html#system">Architecture</a>
+<a href="/world-models.html">World Model</a>
+<a href="/robotics-stack.html">Robotics</a>
+<a href="#lab">Live System</a>
+<a href="#evidence">Evidence</a>
+</nav>
+<a class="header-cta" href="/analog-product-thesis.html">Back to thesis <span>↖</span></a>
+<div class="progress-track"><div class="progress-bar" data-progress></div></div>
+</header>
+
+<main id="lab">
+<section class="lab-hero">
+<div class="container">
+<div class="lab-hero-grid">
+<div>
+<p class="eyebrow reveal">LIVE PROTOTYPE / PHYSICAL INTELLIGENCE CONTROL PLANE</p>
+<h1 class="lab-title reveal">FROM INTENT<br/>TO <em>PHYSICAL ACTION.</em></h1>
+<p class="lab-lede reveal">A working browser prototype of the full Analog-style stack. Issue an operational request to Ana, watch Hive compile and govern the mission, inspect the World Model state used for grounding, see the intelligence router choose a control strategy, and follow the robot through execution, safety and evidence capture.</p>
+<div class="lab-hero-actions reveal">
+<button class="primary-action" id="heroRun" type="button">Run CEO demo <span>→</span></button>
+<a class="secondary-action" href="#control-room">Open control room <span>↓</span></a>
+</div>
+</div>
+<div class="hero-stack-mini reveal" aria-label="Live stack status">
+<div><span class="stack-dot online"></span><b>ANA</b><small>INTENT / PLAN</small></div>
+<i>↓</i>
+<div><span class="stack-dot online"></span><b>HIVE</b><small>MISSION / GOVERNANCE</small></div>
+<i>↓</i>
+<div><span class="stack-dot online"></span><b>WORLD MODEL</b><small>STATE / CONTEXT</small></div>
+<i>↓</i>
+<div><span class="stack-dot online"></span><b>ROBOT ROUTER</b><small>POLICY / FALLBACK</small></div>
+<i>↓</i>
+<div><span class="stack-dot online"></span><b>EDGE RUNTIME</b><small>LOCAL EXECUTION</small></div>
+</div>
+</div>
+<div class="prototype-note reveal"><span>WHAT IS REAL HERE</span><p>The world state, mission state machine, routing logic, safety gates, robot motion, evidence capture and episode replay are live code. Frontier robotics models are represented as selectable policy providers rather than called remotely.</p></div>
+</div>
+</section>
+
+<section class="control-room-section" id="control-room">
+<div class="control-shell">
+<div class="control-topbar">
+<div class="control-brand"><span class="live-pulse"></span><strong>HIVE CONTROL ROOM</strong><small>ANALOG DEMO FACILITY / SECTOR A</small></div>
+<div class="system-clock"><span id="simClock">09:42:16</span><small>GST / SIM TIME</small></div>
+<div class="connection-state"><span></span>EDGE CONNECTED</div>
+</div>
+
+<div class="control-grid">
+<aside class="ana-panel panel">
+<div class="panel-heading"><div><small>01 / ANA</small><h2>Intent & reasoning</h2></div><span class="panel-status ready" id="anaStatus">READY</span></div>
+
+<div class="scenario-chips">
+<button type="button" data-scenario="inspection">Pump anomaly</button>
+<button type="button" data-scenario="safety">Restricted-zone patrol</button>
+<button type="button" data-scenario="manipulation">Pallet recovery</button>
+</div>
+
+<label class="command-label" for="anaCommand">OPERATOR INTENT</label>
+<textarea id="anaCommand" rows="5" spellcheck="false">Inspect pump P-204. If temperature exceeds 90°C, verify valve V-12, create a maintenance incident, and return to dock.</textarea>
+<div class="command-actions">
+<button class="cmd-primary" id="askAna" type="button">ASK ANA <span>↗</span></button>
+<button class="cmd-ghost" id="resetSim" type="button">RESET</button>
+</div>
+
+<div class="reasoning-box" id="reasoningBox">
+<div class="reason-line muted"><span>ANA</span><p>Awaiting operator intent.</p></div>
+</div>
+
+<div class="mission-compile" id="missionCompile" hidden>
+<div><small>MISSION COMPILED</small><strong id="missionTitle">Inspection / P-204</strong></div>
+<button id="dispatchMission" type="button">DISPATCH VIA HIVE <span>→</span></button>
+</div>
+</aside>
+
+<section class="sim-panel panel">
+<div class="panel-heading sim-heading"><div><small>PHYSICAL WORLD / DIGITAL TWIN</small><h2>Robot simulator</h2></div>
+<div class="sim-controls">
+<button type="button" id="pauseMission">PAUSE</button>
+<button type="button" id="injectAnomaly">INJECT ANOMALY</button>
+</div></div>
+
+<div class="sim-stage">
+<canvas id="worldCanvas" width="1100" height="700" aria-label="Top-down robot simulator"></canvas>
+<div class="sim-hud top-left">
+<span>ROBOT</span><strong id="hudRobot">AX-07 / IDLE</strong>
+</div>
+<div class="sim-hud top-right">
+<span>LOCALIZATION</span><strong id="hudPose">x 10.0 / y 10.0</strong>
+</div>
+<div class="sim-hud bottom-left">
+<span>MISSION</span><strong id="hudMission">NO ACTIVE MISSION</strong>
+</div>
+<div class="sim-hud bottom-right">
+<span>SAFETY</span><strong id="hudSafety">NOMINAL</strong>
+</div>
+<div class="approval-modal" id="approvalModal" hidden>
+<span class="approval-icon">!</span>
+<small>SAFETY / TRUST PLANE</small>
+<h3>Human approval required</h3>
+<p id="approvalText">Manipulation of V-12 is classified as a controlled physical action.</p>
+<div><button id="denyApproval" type="button">DENY</button><button id="grantApproval" type="button">APPROVE ACTION</button></div>
+</div>
+</div>
+
+<div class="sim-bottom">
+<div><span>BATTERY</span><b id="batteryValue">92%</b><i><em id="batteryBar" style="width:92%"></em></i></div>
+<div><span>NETWORK</span><b id="networkValue">18 ms</b><i><em style="width:88%"></em></i></div>
+<div><span>LOCAL SAFETY</span><b id="safetyMode">ARMED</b><i><em style="width:100%"></em></i></div>
+<div><span>EPISODE</span><b id="episodeId">—</b><i><em id="episodeBar" style="width:0%"></em></i></div>
+</div>
+</section>
+
+<aside class="state-panel panel">
+<div class="panel-heading"><div><small>02–05 / LIVE STACK</small><h2>System state</h2></div><span class="panel-status ready" id="stackStatus">ONLINE</span></div>
+<div class="stack-tabs" role="tablist">
+<button class="active" type="button" data-tab="world">WORLD</button>
+<button type="button" data-tab="hive">HIVE</button>
+<button type="button" data-tab="router">ROUTER</button>
+<button type="button" data-tab="edge">EDGE</button>
+</div>
+
+<div class="tab-pane active" id="tab-world">
+<div class="world-summary">
+<div><span>ENTITIES</span><b id="entityCount">11</b></div>
+<div><span>ACTIVE FACTS</span><b id="factCount">27</b></div>
+<div><span>CONFIDENCE</span><b id="worldConfidence">97.8%</b></div>
+</div>
+<div class="state-list" id="worldStateList"></div>
+<div class="world-graph" id="worldGraph">
+<svg viewBox="0 0 420 240" aria-label="Semantic scene graph">
+<g class="graph-links"></g><g class="graph-nodes"></g>
+</svg>
+</div>
+</div>
+
+<div class="tab-pane" id="tab-hive">
+<div class="mission-meta">
+<div><span>MISSION</span><b id="hiveMission">—</b></div>
+<div><span>STATE</span><b id="hiveState">IDLE</b></div>
+<div><span>PROGRESS</span><b id="hiveProgress">0%</b></div>
+</div>
+<div class="mission-steps" id="missionSteps"><p class="empty-copy">No mission compiled.</p></div>
+</div>
+
+<div class="tab-pane" id="tab-router">
+<div class="router-decision" id="routerDecision">
+<small>ROBOT INTELLIGENCE ROUTER</small>
+<h3>No active routing decision</h3>
+<p>When a mission step executes, the router evaluates task type, embodiment, risk, latency and confidence.</p>
+</div>
+<div class="router-options" id="routerOptions">
+<div><span>CLASSICAL NAV</span><b>ELIGIBLE</b></div>
+<div><span>GEMINI ROBOTICS ER 2</span><b>STANDBY</b></div>
+<div><span>ISAAC GR00T</span><b>STANDBY</b></div>
+<div><span>SKILD S1</span><b>STANDBY</b></div>
+<div><span>OEM POLICY</span><b>ELIGIBLE</b></div>
+</div>
+</div>
+
+<div class="tab-pane" id="tab-edge">
+<div class="edge-grid">
+<div><span>ROS 2 GRAPH</span><b>18 NODES</b></div>
+<div><span>LOCAL MAP</span><b>FRESH</b></div>
+<div><span>SAFETY SUPERVISOR</span><b>ARMED</b></div>
+<div><span>STORE + FORWARD</span><b>SYNCED</b></div>
+<div><span>OEM ADAPTER</span><b>SPOT-SIM v0.4</b></div>
+<div><span>SKILL RUNTIME</span><b>8 SKILLS</b></div>
+</div>
+<div class="edge-log" id="edgeLog"><div><time>09:42:16</time><span>edge.runtime</span><p>AX-07 ready. Local safety supervisor armed.</p></div></div>
+</div>
+</aside>
+</div>
+
+<div class="trace-strip">
+<div class="trace-heading"><span>END-TO-END SYSTEM TRACE</span><button id="clearTrace" type="button">CLEAR</button></div>
+<div class="trace-events" id="traceEvents">
+<div class="trace-event neutral"><time>09:42:16.000</time><span>WORLD</span><p>Initial site state loaded.</p></div>
+</div>
+</div>
+</div>
+</section>
+
+<section class="evidence-section" id="evidence">
+<div class="container">
+<div class="deep-section-heading reveal"><small>LIVE CLOSED LOOP</small><h2>Execution becomes <em>evidence, replay and learning.</em></h2></div>
+<div class="evidence-grid">
+<article class="evidence-card reveal">
+<div class="evidence-head"><div><small>LATEST EVIDENCE</small><h3>Mission evidence package</h3></div><span id="evidenceStatus">NO MISSION</span></div>
+<div class="thermal-view" id="thermalView"><div class="thermal-grid"></div><div class="thermal-target"><span>P-204</span><b id="thermalTemp">—</b></div><small>THERMAL / SIMULATED SENSOR PAYLOAD</small></div>
+<div class="evidence-facts" id="evidenceFacts">
+<div><span>ASSET</span><b>—</b></div><div><span>OBSERVATION</span><b>—</b></div><div><span>OUTCOME</span><b>—</b></div>
+</div>
+</article>
+
+<article class="episode-card reveal">
+<div class="evidence-head"><div><small>DATA / LEARNING PLANE</small><h3>Episode store</h3></div><button id="replayMission" type="button" disabled>REPLAY</button></div>
+<div class="episode-score">
+<div><span>SUCCESS</span><b id="successScore">—</b></div>
+<div><span>INTERVENTIONS</span><b id="interventionCount">0</b></div>
+<div><span>EVENTS</span><b id="eventCount">0</b></div>
+</div>
+<div class="episode-timeline" id="episodeTimeline"><p class="empty-copy">Completed missions become replayable episodes here.</p></div>
+</article>
+</div>
+
+<div class="architecture-proof reveal">
+<div><span>ANA</span><small>INTENT</small></div><i>→</i>
+<div><span>HIVE</span><small>MISSION</small></div><i>→</i>
+<div><span>WORLD MODEL</span><small>GROUNDING</small></div><i>→</i>
+<div><span>ROUTER</span><small>INTELLIGENCE</small></div><i>→</i>
+<div><span>EDGE</span><small>SAFE EXECUTION</small></div><i>→</i>
+<div><span>EMBODIMENT</span><small>ACTION</small></div><i>→</i>
+<div><span>EVIDENCE</span><small>LEARNING</small></div>
+</div>
+</div>
+</section>
+
+<section class="deep-cta">
+<div class="container reveal">
+<p class="deep-kicker">THE PRODUCT POINT</p>
+<h2>Analog does not need to own every model or robot.<br/><em>It needs to own the operating loop.</em></h2>
+<p class="lab-outro">This prototype makes that product thesis executable: a common world state, governed missions, pluggable robot intelligence, local safety and an evidence loop that improves every deployment.</p>
+<div class="finale-actions"><a class="primary-action" href="/analog-product-thesis.html#system">Back to architecture <span>↖</span></a><a class="secondary-action" href="/robotics-stack.html">Robotics deep dive <span>→</span></a></div>
+</div>
+</section>
+</main>
+
+<div class="cursor" aria-hidden="true"><span></span></div>
+<script src="/script.js" defer></script>
+<script src="/live-system.js" defer></script>
+</body>
+</html>
