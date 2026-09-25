@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<meta name="theme-color" content="#09080d"/><meta name="description" content="Analog Robotics Stack product architecture — intelligence routing, edge runtime, OEM adapters, safety, learning and embodiment."/>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="/styles-a.css"/><link rel="stylesheet" href="/styles-b.css"/><link rel="stylesheet" href="/architecture.css"/>
+<title>Analog Robotics Stack — Product Architecture</title>
+</head>
+<body class="deep-page">
+<canvas id="fabric-canvas" aria-hidden="true"></canvas><div class="grain" aria-hidden="true"></div>
+<div class="ambient ambient-one" data-parallax="-0.08" aria-hidden="true"></div><div class="ambient ambient-two" data-parallax="0.06" aria-hidden="true"></div>
+<header class="site-header is-scrolled" data-header>
+<a class="brand" href="/analog-product-thesis.html#system"><span class="brand-mark"><i></i><i></i></span><span class="brand-copy"><strong>AJAY CYRIL</strong><small>ANALOG PRODUCT ARCHITECTURE / ROBOTICS STACK</small></span></a>
+<nav class="desktop-nav"><a href="/analog-product-thesis.html">Thesis</a><a href="#stack">Stack</a><a href="#router">Router</a><a href="#runtime">Runtime</a><a href="/world-models.html">World Model</a></nav>
+<a class="header-cta" href="/analog-product-thesis.html#system">Back to stack <span>↖</span></a>
+<div class="progress-track"><div class="progress-bar" data-progress></div></div>
+</header>
+<main>
+<section class="deep-hero">
+<div class="container deep-hero-grid">
+<div><p class="deep-kicker reveal">DEEP DIVE 02 / ROBOTICS AS A STACK</p><h1 class="deep-title reveal">ONE CONTROL PLANE.<br/><em>MANY BODIES.</em></h1>
+<p class="deep-lede reveal">Analog should not bet the company on one robot, one VLA or one OEM SDK. The product is the abstraction layer that makes heterogeneous robots operable, governable and continuously improvable across real customer sites.</p></div>
+<div class="deep-meta reveal">
+<span>PRODUCT JOB</span><strong>Turn robot diversity into a stable enterprise operating surface.</strong>
+<span>CORE ABSTRACTION</span><strong>Capabilities, skills, missions, evidence and safety envelopes.</strong>
+<span>KEY DESIGN PRINCIPLE</span><strong>Route intelligence dynamically. Keep deterministic control and fail-safe behavior local.</strong>
+</div></div>
+<div class="deep-orb" data-parallax="0.04" aria-hidden="true"></div>
+</section>
+
+<section class="deep-section" id="stack">
+<div class="container">
+<div class="deep-section-heading reveal"><small>01 / ROBOTICS REFERENCE STACK</small><h2>Separate cognition from <em>control, hardware and operations.</em></h2></div>
+<div class="flow-stack">
+<div class="flow-node reveal"><span>07 / ANA</span><div><h3>Intent + planning</h3><p>Human request, reasoning, explanation, task decomposition and interaction.</p></div><b>↓</b></div><div class="flow-arrow">↓</div>
+<div class="flow-node reveal"><span>06 / HIVE</span><div><h3>Mission orchestration</h3><p>Fleet, workflows, schedules, enterprise systems, incidents, approval and evidence.</p></div><b>↓</b></div><div class="flow-arrow">↓</div>
+<div class="flow-node reveal"><span>05 / WORLD MODEL</span><div><h3>Shared operational state</h3><p>Spatial memory, asset context, hazards, people, robot state, history and predicted future state.</p></div><b>↓</b></div><div class="flow-arrow">↓</div>
+<div class="flow-node reveal"><span>04 / ROUTER</span><div><h3>Robot Intelligence Router</h3><p>Selects GR00T, Gemini, Skild, FieldAI, OEM policy or classical planning based on embodiment, task, risk, latency and confidence.</p></div><b>↓</b></div><div class="flow-arrow">↓</div>
+<div class="flow-node reveal"><span>03 / EDGE</span><div><h3>Analog Robot Edge Runtime</h3><p>ROS 2 graph, adapters, local map, skill executor, safety supervisor, cache, telemetry and offline behavior.</p></div><b>↓</b></div><div class="flow-arrow">↓</div>
+<div class="flow-node reveal"><span>02 / OEM</span><div><h3>OEM robot software</h3><p>Spot SDK, Unitree, UR, FANUC, drone autopilots, AMR controllers and humanoid runtime.</p></div><b>↓</b></div><div class="flow-arrow">↓</div>
+<div class="flow-node reveal"><span>01 / BODY</span><div><h3>Embodiment</h3><p>Robots, drones, cameras, grippers, sensors, actuators and site infrastructure.</p></div><b>↺</b></div>
+</div>
+</div>
+</section>
+
+<section class="deep-section light" id="router">
+<div class="container">
+<div class="deep-section-heading reveal"><small>02 / ROBOT INTELLIGENCE ROUTER</small><h2>The moat is not choosing a model. <em>It is choosing correctly every time.</em></h2></div>
+<div class="decision-matrix">
+<article class="decision-card reveal"><h3>Task semantics</h3><p>Navigation, inspection, manipulation, perception, dialogue, recovery and anomaly handling require different intelligence.</p><small>WHAT KIND OF PROBLEM?</small></article>
+<article class="decision-card reveal"><h3>Embodiment fit</h3><p>Policies are only eligible when they support the robot morphology, sensors, action space and calibrated control interface.</p><small>CAN THIS MODEL DRIVE THIS BODY?</small></article>
+<article class="decision-card reveal"><h3>Risk + authority</h3><p>High-risk actions may require deterministic planners, tighter constraints or human approval regardless of model confidence.</p><small>WHAT IS ALLOWED?</small></article>
+<article class="decision-card reveal"><h3>Latency + connectivity</h3><p>Cloud reasoning can assist planning, but reactive safety and core motion must survive network loss.</p><small>WHERE MUST IT RUN?</small></article>
+<article class="decision-card reveal"><h3>Confidence + fallback</h3><p>If a policy is uncertain or drifts outside its operating envelope, route to a safer model, classical skill or remote operator.</p><small>WHEN DO WE SWITCH?</small></article>
+<article class="decision-card reveal"><h3>Economics</h3><p>Use the cheapest intelligence that meets success and safety thresholds rather than invoking frontier models for every step.</p><small>WHAT IS THE COST OF SUCCESS?</small></article>
+</div>
+</div>
+</section>
+
+<section class="deep-section" id="runtime">
+<div class="container">
+<div class="deep-section-heading reveal"><small>03 / ANALOG ROBOT EDGE RUNTIME</small><h2>Cloud intelligence above. <em>Deterministic execution below.</em></h2></div>
+<div class="deep-grid">
+<article class="tech-card reveal"><small>ROS 2 FABRIC</small><h3>Local message graph</h3><p>Typed topics, services, actions and lifecycle nodes connect perception, skills and OEM adapters.</p><ul><li>DDS / QoS profiles</li><li>Node lifecycle</li><li>Namespaced robots</li><li>Time synchronization</li></ul></article>
+<article class="tech-card reveal"><small>ADAPTER LAYER</small><h3>OEM abstraction</h3><p>Translate Analog skill contracts into Spot, Unitree, UR, FANUC, drone and AMR-specific calls.</p><ul><li>Capability discovery</li><li>Command translation</li><li>Telemetry normalization</li><li>Error mapping</li></ul></article>
+<article class="tech-card reveal"><small>LOCAL WORLD</small><h3>Map + scene cache</h3><p>Keep the minimum state required for low-latency autonomy and degraded/offline operation.</p><ul><li>Local map</li><li>Robot pose</li><li>Obstacle state</li><li>Mission context cache</li></ul></article>
+<article class="tech-card reveal"><small>SKILL RUNTIME</small><h3>Executable primitives</h3><p>Versioned skills expose preconditions, parameters, progress, cancel, recovery and expected evidence.</p><ul><li>Navigate</li><li>Inspect</li><li>Manipulate</li><li>Dock / recover</li></ul></article>
+<article class="tech-card reveal"><small>SAFETY SUPERVISOR</small><h3>Independent guardrail</h3><p>A lower-level safety path can stop or constrain execution even when a model or cloud service is wrong.</p><ul><li>Geofencing</li><li>Speed / force limits</li><li>E-stop integration</li><li>Fail-safe state machine</li></ul></article>
+<article class="tech-card reveal"><small>EDGE OBSERVABILITY</small><h3>Evidence at source</h3><p>Record commands, model choice, sensor state, exceptions and mission evidence before syncing upstream.</p><ul><li>Episode log</li><li>Video / sensor snippets</li><li>Trace IDs</li><li>Store + forward</li></ul></article>
+</div>
+</div>
+</section>
+
+<section class="deep-section">
+<div class="container">
+<div class="deep-section-heading reveal"><small>04 / CROSS-CUTTING PLANES</small><h2>Two planes make the stack <em>deployable at enterprise scale.</em></h2></div>
+<div class="split-plane">
+<div class="split-panel reveal"><h3>Data / Learning Plane</h3><ul>
+<li><b>TELEOP</b><span>Capture expert interventions and recovery demonstrations.</span></li>
+<li><b>EPISODES</b><span>Store successful, failed and edge-case trajectories with context.</span></li>
+<li><b>SIMULATION</b><span>Replay and test mission logic before physical deployment.</span></li>
+<li><b>SYNTHETIC</b><span>Generate rare scenarios and expand environment diversity.</span></li>
+<li><b>EVALUATION</b><span>Benchmark policies by task success, safety, latency and intervention rate.</span></li>
+<li><b>FINE-TUNING</b><span>Adapt selected models only where proprietary data creates advantage.</span></li>
+</ul></div>
+<div class="split-panel reveal"><h3>Safety / Trust Plane</h3><ul>
+<li><b>IDENTITY</b><span>Robot, user, service and site identities are cryptographically bound.</span></li>
+<li><b>PERMISSIONS</b><span>Capabilities are scoped by role, site, mission and risk class.</span></li>
+<li><b>GEOFENCING</b><span>Spatial policies constrain where robots and skills may operate.</span></li>
+<li><b>APPROVAL</b><span>Human authority gates material, novel or high-risk actions.</span></li>
+<li><b>AUDIT</b><span>Every decision, command, override and outcome is replayable.</span></li>
+<li><b>FAIL-SAFE</b><span>Independent stop, recovery and degraded-mode behavior.</span></li>
+</ul></div>
+</div>
+</div>
+</section>
+
+<section class="deep-section light">
+<div class="container">
+<div class="deep-section-heading reveal"><small>05 / BUILD VS PARTNER</small><h2>Own the abstraction. <em>Partner for the frontier.</em></h2></div>
+<div class="decision-matrix">
+<article class="decision-card reveal"><h3>Build: Robot Intelligence Router</h3><p>Model / policy selection, eligibility, confidence, economics and fallback logic become Analog's control point.</p><small>CORE IP</small></article>
+<article class="decision-card reveal"><h3>Build: Edge Runtime</h3><p>Stable skill, telemetry, safety, identity and offline contracts make OEM diversity manageable.</p><small>CORE PLATFORM</small></article>
+<article class="decision-card reveal"><h3>Build: Capability contract</h3><p>Normalize what a robot can do, required preconditions, evidence and operating envelope.</p><small>PORTABILITY LAYER</small></article>
+<article class="decision-card reveal"><h3>Partner: robot OEMs</h3><p>Use best-in-class bodies, controllers, payloads and field support rather than vertically integrating hardware.</p><small>OEM ECOSYSTEM</small></article>
+<article class="decision-card reveal"><h3>Partner: foundation robotics</h3><p>GR00T, Gemini Robotics, Skild, FieldAI and future models compete behind the router.</p><small>MODEL ECOSYSTEM</small></article>
+<article class="decision-card reveal"><h3>Own: operations + evidence</h3><p>Hive, site integration, fleet workflows, intervention and SLA evidence turn autonomy into a sellable service.</p><small>COMMERCIAL MOAT</small></article>
+</div>
+</div>
+</section>
+
+<section class="deep-cta"><div class="container reveal"><p class="deep-kicker">BACK TO THE SYSTEM</p><h2>Many robots. Many models.<br/><em>One governed operating layer.</em></h2>
+<div class="finale-actions"><a class="primary-action" href="/analog-product-thesis.html#system">Full architecture <span>↗</span></a><a class="secondary-action" href="/world-models.html">World Model <span>→</span></a></div></div></section>
+</main>
+<div class="cursor" aria-hidden="true"><span></span></div><script src="/script.js" defer></script>
+</body></html>
