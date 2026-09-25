@@ -3,6 +3,12 @@ on:
   push:
     branches: [interactive-stack-v3]
   workflow_dispatch:
+    inputs:
+      full_missions:
+        description: Run complete city and factory mission acceptance
+        required: false
+        type: boolean
+        default: true
 permissions:
   contents: read
 concurrency:
@@ -11,7 +17,7 @@ concurrency:
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 18
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - uses: actions/upload-artifact@v4
@@ -31,13 +37,15 @@ jobs:
         with:
           node-version: '22'
       - run: npm install
-      - name: Verify interactive views
-        if: ${{ hashFiles('tests/interactive-check.mjs') != '' }}
+      - run: npx playwright install --with-deps chromium
+      - name: Presentation and live-state regression
         run: |
-          npx playwright install --with-deps chromium
           npm run dev > /tmp/app.log 2>&1 &
           for i in $(seq 1 70); do curl -sf http://localhost:3000/api/health >/dev/null && break || sleep 2; done
-          node tests/interactive-check.mjs
+          node tests/presentation-check.mjs
+      - name: Full mission acceptance
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.full_missions }}
+        run: node tests/interactive-check.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
