@@ -2,9 +2,12 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Physical AI Safety Zone",
+  title: {
+    default: "Physical Intelligence — Product Thesis & Live Robotics Lab",
+    template: "%s | Physical Intelligence",
+  },
   description:
-    "A Vercel-hosted dashboard and local supervision-based edge agent for no-go zone monitoring.",
+    "A working reference architecture for Physical Intelligence: grounded intent, world state, mission orchestration, policy routing, robot-edge safety, browser physics and live camera perception.",
 };
 
 export default function RootLayout({
