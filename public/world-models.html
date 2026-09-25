@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<meta name="theme-color" content="#09080d"/><meta name="description" content="Analog World Model product architecture — spatial memory, semantic scene graph, temporal state, prediction and operational grounding."/>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="/styles-a.css"/><link rel="stylesheet" href="/styles-b.css"/><link rel="stylesheet" href="/architecture.css"/>
+<title>Analog World Model — Product Architecture</title>
+</head>
+<body class="deep-page">
+<canvas id="fabric-canvas" aria-hidden="true"></canvas><div class="grain" aria-hidden="true"></div>
+<div class="ambient ambient-one" data-parallax="-0.08" aria-hidden="true"></div><div class="ambient ambient-two" data-parallax="0.06" aria-hidden="true"></div>
+<header class="site-header is-scrolled" data-header>
+<a class="brand" href="/analog-product-thesis.html#system"><span class="brand-mark"><i></i><i></i></span><span class="brand-copy"><strong>AJAY CYRIL</strong><small>ANALOG PRODUCT ARCHITECTURE / WORLD MODEL</small></span></a>
+<nav class="desktop-nav"><a href="/analog-product-thesis.html">Thesis</a><a href="#architecture">Architecture</a><a href="#state">State</a><a href="#prediction">Prediction</a><a href="/robotics-stack.html">Robotics Stack</a></nav>
+<a class="header-cta" href="/analog-product-thesis.html#system">Back to stack <span>↖</span></a>
+<div class="progress-track"><div class="progress-bar" data-progress></div></div>
+</header>
+<main>
+<section class="deep-hero">
+<div class="container deep-hero-grid">
+<div>
+<p class="deep-kicker reveal">DEEP DIVE 01 / ANALOG WORLD MODEL</p>
+<h1 class="deep-title reveal">THE SYSTEM'S<br/><em>MEMORY OF REALITY.</em></h1>
+<p class="deep-lede reveal">A continuously updated, spatial and temporal representation of assets, people, robots, sensors, relationships, uncertainty and possible future states. The World Model is not the robot brain. It is the shared operational reality every brain can reason over.</p>
+</div>
+<div class="deep-meta reveal">
+<span>PRIMARY PRODUCT JOB</span><strong>Turn fragmented physical signals into trusted, queryable operational state.</strong>
+<span>CORE DATA STRUCTURE</span><strong>Semantic scene graph + temporal event history + spatial memory.</strong>
+<span>OUTPUT</span><strong>Current state, confidence, constraints, context and predicted future state.</strong>
+</div>
+</div>
+<div class="deep-orb" data-parallax="0.04" aria-hidden="true"></div>
+</section>
+
+<section class="deep-section" id="architecture">
+<div class="container">
+<div class="deep-section-heading reveal"><small>01 / REFERENCE ARCHITECTURE</small><h2>From raw signals to a <em>shared model of the world.</em></h2></div>
+<div class="flow-stack">
+<div class="flow-node reveal"><span>01 / INGEST</span><div><h3>Observation adapters</h3><p>Robots, cameras, IoT, BIM, GIS, BMS, SCADA and enterprise systems enter through typed adapters with source identity and timestamps.</p></div><b>↓</b></div>
+<div class="flow-arrow">↓</div>
+<div class="flow-node reveal"><span>02 / NORMALIZE</span><div><h3>Entity + event canonicalization</h3><p>Normalize heterogeneous telemetry into entities, observations, events, relationships, coordinate frames and capability descriptors.</p></div><b>↓</b></div>
+<div class="flow-arrow">↓</div>
+<div class="flow-node reveal"><span>03 / FUSE</span><div><h3>State estimation + identity resolution</h3><p>Resolve duplicate identities, reconcile contradictory sources and maintain confidence, freshness, provenance and uncertainty.</p></div><b>↓</b></div>
+<div class="flow-arrow">↓</div>
+<div class="flow-node reveal"><span>04 / REPRESENT</span><div><h3>Semantic scene graph</h3><p>Objects, rooms, zones, assets, people, hazards, robots and enterprise concepts become a graph of typed relationships and constraints.</p></div><b>↓</b></div>
+<div class="flow-arrow">↓</div>
+<div class="flow-node reveal"><span>05 / REMEMBER</span><div><h3>Spatial + temporal memory</h3><p>Current state is paired with history: what moved, changed, failed, was inspected, was predicted and was actually verified.</p></div><b>↓</b></div>
+<div class="flow-arrow">↓</div>
+<div class="flow-node reveal"><span>06 / PREDICT</span><div><h3>Future-state services</h3><p>Rules, learned predictors, physics simulation and external world models propose likely future states without overwriting observed truth.</p></div><b>↓</b></div>
+<div class="flow-arrow">↓</div>
+<div class="flow-node reveal"><span>07 / SERVE</span><div><h3>Context + action APIs</h3><p>Ana, Hive and the Robot Intelligence Router query state, retrieve context, test candidate actions and write verified outcomes back.</p></div><b>↺</b></div>
+</div>
+</div>
+</section>
+
+<section class="deep-section light" id="state">
+<div class="container">
+<div class="deep-section-heading reveal"><small>02 / STATE MODEL</small><h2>Reality has to be <em>typed, temporal and uncertain.</em></h2></div>
+<div class="deep-grid">
+<article class="tech-card reveal"><small>ENTITY GRAPH</small><h3>What exists</h3><p>A canonical model for people, places, assets, robots, sensors, tasks and business objects.</p><ul><li>Stable IDs + aliases</li><li>Parent / child topology</li><li>Ownership + tenancy</li><li>Capabilities + constraints</li></ul></article>
+<article class="tech-card reveal"><small>SPATIAL MEMORY</small><h3>Where it exists</h3><p>Coordinate frames and topology connect maps, rooms, zones, robot localization and geospatial estate context.</p><ul><li>Global / site / room frames</li><li>2D + 3D geometry</li><li>Occupancy + traversability</li><li>Zones + geofences</li></ul></article>
+<article class="tech-card reveal"><small>TEMPORAL MEMORY</small><h3>How it changed</h3><p>Append-only observations and events preserve sequence, causality, trends and replayable evidence.</p><ul><li>Event history</li><li>State snapshots</li><li>Mission replay</li><li>Change provenance</li></ul></article>
+<article class="tech-card reveal"><small>PROVENANCE</small><h3>Why we trust it</h3><p>Every fact carries source, timestamp, confidence, derivation and freshness so inference never masquerades as observation.</p><ul><li>Observed vs inferred</li><li>Confidence scores</li><li>Freshness windows</li><li>Source lineage</li></ul></article>
+<article class="tech-card reveal"><small>SEMANTICS</small><h3>What it means</h3><p>The graph attaches domain meaning: inspection required, person authorized, valve controllable, route blocked, asset critical.</p><ul><li>Ontology</li><li>Relationships</li><li>Business semantics</li><li>Policy attributes</li></ul></article>
+<article class="tech-card reveal"><small>CAPABILITY MODEL</small><h3>What can act</h3><p>Robots and systems expose typed skills, payloads, precision, safety envelopes and preconditions.</p><ul><li>Skill descriptors</li><li>Robot affordances</li><li>Preconditions</li><li>Expected evidence</li></ul></article>
+</div>
+</div>
+</section>
+
+<section class="deep-section" id="prediction">
+<div class="container">
+<div class="deep-section-heading reveal"><small>03 / OPERATIONAL TRUTH × LEARNED IMAGINATION</small><h2>Prediction should extend reality, <em>not contaminate it.</em></h2></div>
+<div class="split-plane">
+<div class="split-panel reveal"><h3>Analog owns trusted state</h3><ul>
+<li><b>OBSERVED</b><span>Sensor / robot / system facts with provenance.</span></li>
+<li><b>INFERRED</b><span>Derived state with confidence and expiry.</span></li>
+<li><b>AUTHORIZED</b><span>Policy-approved actions and human approvals.</span></li>
+<li><b>VERIFIED</b><span>Outcome evidence written back after execution.</span></li>
+</ul></div>
+<div class="split-panel reveal"><h3>Models supply possible futures</h3><ul>
+<li><b>PREDICTED</b><span>Time-series, failure, occupancy and risk forecasts.</span></li>
+<li><b>SIMULATED</b><span>Physics / digital-twin rollouts and counterfactuals.</span></li>
+<li><b>GENERATED</b><span>Learned scene evolution or synthetic episodes.</span></li>
+<li><b>PLANNED</b><span>Candidate trajectories, actions and task sequences.</span></li>
+</ul></div>
+</div>
+</div>
+</section>
+
+<section class="deep-section light">
+<div class="container">
+<div class="deep-section-heading reveal"><small>04 / PRODUCT DECISIONS</small><h2>What should be native, <em>what should be pluggable.</em></h2></div>
+<div class="decision-matrix">
+<article class="decision-card reveal"><h3>Native: semantic operational graph</h3><p>This is the durable system of record for physical state, identity, policy context and outcome evidence.</p><small>CORE IP / DIFFERENTIATION</small></article>
+<article class="decision-card reveal"><h3>Native: spatial + temporal memory</h3><p>History, topology, confidence and replay are what make the estate useful to humans, agents and robots.</p><small>CORE PLATFORM</small></article>
+<article class="decision-card reveal"><h3>Pluggable: frontier world models</h3><p>Cosmos-like, video, latent, multimodal and predictive models should compete behind stable interfaces.</p><small>MODEL GATEWAY</small></article>
+<article class="decision-card reveal"><h3>Pluggable: physics simulation</h3><p>Use the best available simulator for the embodiment and environment rather than building a generic simulator.</p><small>SIMULATION ADAPTER</small></article>
+<article class="decision-card reveal"><h3>Native: state contract</h3><p>Every consumer receives the same distinction between observed, inferred, predicted, simulated and authorized state.</p><small>TRUST CONTRACT</small></article>
+<article class="decision-card reveal"><h3>Native: outcome loop</h3><p>Actions and evidence return to the graph so each mission strengthens operations, evaluation and learning data.</p><small>LEARNING MOAT</small></article>
+</div>
+</div>
+</section>
+
+<section class="deep-cta">
+<div class="container reveal"><p class="deep-kicker">BACK TO THE SYSTEM</p><h2>The World Model grounds.<br/><em>Hive orchestrates. Robots act.</em></h2>
+<div class="finale-actions"><a class="primary-action" href="/analog-product-thesis.html#system">Full architecture <span>↗</span></a><a class="secondary-action" href="/robotics-stack.html">Robotics stack <span>→</span></a></div></div>
+</section>
+</main>
+<div class="cursor" aria-hidden="true"><span></span></div><script src="/script.js" defer></script>
+</body></html>
