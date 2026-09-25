@@ -1,0 +1,47 @@
+name: Visual control room acceptance
+on:
+  workflow_dispatch:
+  push:
+    branches: [live-city-polish]
+permissions:
+  contents: read
+concurrency:
+  group: visual-control-room
+  cancel-in-progress: true
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install
+      - run: node scripts/prepare-studio.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: implementation-context
+          retention-days: 2
+          compression-level: 6
+          path: |
+            public/
+            scripts/
+            app/api/
+            tests/
+            package.json
+            README.md
+      - run: npx playwright install --with-deps chromium
+      - name: Browser evidence
+        run: |
+          npm run dev > /tmp/app.log 2>&1 &
+          for i in $(seq 1 80); do curl -sf http://localhost:3000/api/health >/dev/null && break || sleep 2; done
+          if [ -f tests/city-check.mjs ]; then node tests/city-check.mjs; else node tests/control-room-check.mjs; fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: visual-acceptance-report
+          retention-days: 3
+          path: |
+            test-report/
+            /tmp/app.log
