@@ -2,17 +2,17 @@ name: Control room browser check
 on:
   workflow_dispatch:
   push:
-    branches: [main]
-    paths: ['app/**', 'public/**', 'tests/control-room-check.mjs', '.github/workflows/control-room-check.yml', 'scripts/**', 'package.json']
+    branches: [main, cognitive-city]
+    paths: ['app/**', 'public/**', 'tests/**', '.github/workflows/control-room-check.yml', 'scripts/**', 'package.json']
 permissions:
   contents: read
 concurrency:
-  group: control-room-check
+  group: control-room-check-${{ github.ref }}
   cancel-in-progress: true
 jobs:
   browser:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 18
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -20,16 +20,30 @@ jobs:
           node-version: '22'
       - run: npm install
       - run: npx playwright install --with-deps chromium
+      - name: Check city dynamics
+        run: node --test tests/city-model.test.mjs
       - name: Start app
         run: |
           npm run dev > /tmp/app.log 2>&1 &
-          for i in $(seq 1 80); do curl -sf http://localhost:3000/api/health >/dev/null && break || sleep 2; done
-      - name: Check UI and execution
+          for i in $(seq 1 180); do curl -sf http://localhost:3000/api/health >/dev/null && break || sleep 2; done
+      - name: City video, response and readability
+        id: city
+        continue-on-error: true
+        run: node tests/city-check.mjs
+      - name: Factory regression
+        id: factory
+        continue-on-error: true
         run: node tests/control-room-check.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: control-room-browser-report
           path: |
-            test-report/
+            test-report/*.png
+            test-report/*.json
             /tmp/app.log
+      - name: Acceptance gate
+        if: always()
+        run: |
+          test '${{ steps.city.outcome }}' = 'success'
+          test '${{ steps.factory.outcome }}' = 'success'
