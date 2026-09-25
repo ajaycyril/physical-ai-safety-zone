@@ -1,65 +1,54 @@
-# Physical Intelligence / control room
+# Physical Intelligence
 
-A single-screen demonstration of camera perception, world state, mission orchestration and robot execution.
+A visual operating stack with two working environments, by Ajay Cyril.
 
-**Site:** https://next-project-to-show-physical-ai.vercel.app  
-**Control room:** https://next-project-to-show-physical-ai.vercel.app/studio.html
+**[Cognitive city](https://next-project-to-show-physical-ai.vercel.app/city.html)** · **[Factory robotics](https://next-project-to-show-physical-ai.vercel.app/studio.html)**
 
-## Run the task
+Run a mission. Watch the active layer, the shared world, the camera evidence and the physical response together. Open Architecture to inspect each layer's input, output and running implementation.
 
-Click **Run mission**. Follow the bottom workflow and the active layer on the left. Approve the scoped valve action when requested. The robot navigates, scans an instrument, performs a valve sequence, verifies the resulting state and returns to its dock.
+## Cognitive city
 
-Switch to **Architecture** to inspect each layer's components and input/output contract. **Trace a sample task** animates the handoffs without executing a mission.
+Two self-hosted videos feed EfficientDet Lite0 in a browser worker. Actual object counts and frame timestamps update a shared world graph. The mission service checks evidence freshness and scope. Two clones of the same junction model compare signal policies before a survey drone, human approval and an interlocked signal change. Vehicles accelerate, stop, yield and clear the crossing. A field unit dispatches while the drone returns to its rooftop pad.
 
-## What is real, and what is simulated
+The district is **Hyderabad-inspired and illustrative**. The clips are **independent stock footage, not Hyderabad CCTV**. Video counts scale scenario demand; there is no calibrated mapping from image coordinates to the 3D streets. Predictions and traffic outcomes are simulated, not measured city benefits. The drone follows a bounded waypoint controller, not a flight physics model. No infrastructure is connected.
 
-| Component | Implementation |
+## Factory robotics
+
+Recorded factory footage produces real neural person detections. Camera evidence changes route choice. A* planning and MuJoCo joint servos move the robot through inspection, scoped valve approval, a multi-joint valve skill, feedback verification and docking. The robot camera renders the same scene. A synthetic gauge is read using calibrated needle-pixel analysis; it is **not** a pressure measurement taken from the stock film. Valve interaction is simulated actuator I/O, not learned grasping.
+
+## Running components
+
+| Layer | Implementation |
 |---|---|
-| Factory video | Self-hosted, recorded footage. Not a live factory feed. |
-| Person detection | MediaPipe EfficientDet Lite0 evaluates actual video frames in the browser. Scores are model outputs. |
-| Camera-to-world binding | An operator-selected image region is mapped to the demo aisle. This is not automatic metric 3D reconstruction. |
-| Mission planning | Bounded rule-based Next.js compiler using current world state. No LLM dependency. |
-| Navigation | A* grid planning, obstacle inflation, waypoint execution and local feedback. |
-| Robot dynamics | MuJoCo WebAssembly, named joints and position actuators. The mobile base is planar constrained; wheel visuals use odometry. |
-| Arm and valve | Joint-space inspection and valve skills. Valve interaction is simulated actuator I/O, not learned grasping or contact-transferred manipulation. |
-| Plant pressure | A modeled first-order response to the simulated valve's feedback. Not a reading extracted from the factory footage. |
-| Gauge vision | Calibrated needle-pixel analysis on a synthetic instrument. Classical computer vision, not a neural model. |
-| Wrist camera | A second rendered camera into the same simulated scene. |
-| Safety | Local stop, pause, cancellation, route constraints and scoped approval. Simulation only; no functional-safety certification. |
-| Evidence | Timestamped events, source observations and recorded joint/pose snapshots. Local storage, JSON export and state replay. |
+| Intent | Bounded Next.js mission APIs; no LLM dependency |
+| Mission control | Cancellable async state machines, approval and evidence |
+| World model | Entity graph, source timestamps, history and separate modeled future states |
+| Policy | Capability/scope checks, A* routing and deterministic signal-plan comparison |
+| Edge | MediaPipe worker inference, multi-reason holds and local controllers |
+| Adapters | Typed simulation interfaces; no live equipment access |
+| Embodiment | MuJoCo factory; Three.js city with car-following and signal interlocks |
+| Learning/evidence | Recorded state replay, local browser episodes and JSON export |
 
-The factory observation affects route selection. Missing or stale camera evidence is treated as unknown, not as proof that an area is clear.
+This is a public reference implementation, not a safety-certified autonomous system. Frontier models are research references and possible future integrations, not claimed running dependencies.
 
-## Stack
+## Media provenance
 
-Intent → mission control → world state → policy router → local runtime → simulation adapter → physical world.
+- [Factory conveyor](https://www.pexels.com/video/man-working-on-conveyor-machine-855091/) — Pixabay / Pexels, CC0.
+- [Highway traffic](https://www.pexels.com/video/cars-on-highway-854671/) — Pixabay / Pexels, CC0; UK footage.
+- [Pedestrian crossing](https://www.pexels.com/video/tourist-crossing-the-street-855565/) — Pixabay / Pexels, CC0.
+- [Gauge reference](https://www.pexels.com/video/a-gauge-use-to-measure-quantity-and-weight-2853796/) — K / Pexels license; reference only.
 
-Safety and evidence cross all layers. The interface separates observations, policy decisions, actions and verified feedback.
+Build scripts download and self-host footage, the neural model and runtime assets. City media has byte counts and SHA-256 provenance in `/media/city-manifest.json`. Missing required city footage fails the build rather than silently showing a placeholder.
 
-## Development
+## Development and acceptance
 
-```bash
+```sh
 npm install
 npm run dev
-```
-
-Open `http://localhost:3000/studio.html`.
-
-`prepare-studio.mjs` self-hosts the MuJoCo, Three.js and MediaPipe runtime assets, downloads the detection model and prepares the sample footage. A manifest records whether each asset was retrieved.
-
-```bash
 npm run build
 npm run e2e
 ```
 
-The browser workflow captures screenshots, checks desktop fit, exercises a complete mission, and records runtime state and errors. Browser evidence—not an HTTP 200 alone—is the acceptance check.
+The browser workflow tests video decoding, actual detections, mission completion, approval, cancellation, replay, desktop fit and mobile overflow. Screenshots and JSON state reports are saved as a GitHub Actions artifact. HTTP 200 alone is not the acceptance test.
 
-## Media and tools
-
-- [Factory sample: Man working on conveyor machine](https://www.pexels.com/video/man-working-on-conveyor-machine-855091/) — Pixabay / Pexels, CC0.
-- [Gauge reference clip](https://www.pexels.com/video/a-gauge-use-to-measure-quantity-and-weight-2853796/) — K / Pexels, Pexels License. Downloaded as a reference, not used to claim a real plant-pressure reading.
-- [MuJoCo WebAssembly](https://github.com/google-deepmind/mujoco/tree/main/wasm)
-- [MediaPipe browser object detection](https://ai.google.dev/edge/mediapipe/solutions/vision/object_detector/web_js)
-- [Three.js](https://threejs.org/)
-
-Camera access is opt-in. Raw webcam frames are not uploaded. There is no connection to real machinery.
+Primary tools: [MuJoCo](https://github.com/google-deepmind/mujoco/tree/main/wasm), [MediaPipe Object Detector](https://ai.google.dev/edge/mediapipe/solutions/vision/object_detector/web_js), [Three.js](https://threejs.org/).

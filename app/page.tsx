@@ -1,5 +1,2 @@
 import { redirect } from "next/navigation";
-
-export default function Home() {
-  redirect("/physical-intelligence.html");
-}
+export default function Home() { redirect("/city.html"); }
