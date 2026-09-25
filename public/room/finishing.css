@@ -1,0 +1,22 @@
+/* Contrast and compositor cleanup after browser screenshot review. */
+.pi-tabs button,.brief .pi-tabs button{transform:none!important}
+.pi-tabs button.active,.pi-tabs button.active:hover,.brief .pi-tabs button.active,.brief .pi-tabs button.active:hover{background:#d0bff3!important;color:#201a31!important}
+.pi-tabs button:not(.active):hover,.brief .pi-tabs button:not(.active):hover{background:#252839!important;color:#f0edf8!important}
+.pi-explore-open>:not(.pi-explorer):not(.pi-inspector){display:none!important}
+.pi-explorer{background:#121620;isolation:isolate;contain:paint;animation:none}
+.pi-stack-row{background:#181e2a;border-color:#49526555}
+.pi-stack-row:hover{background:#24283a}
+.pi-stack-row.selected{background:#2b2940;border-color:#bbaaec99}
+.pi-plane{background:#1b2030}.pi-plane.trust{background:#182a2c}
+.pi-arch-detail{background:#121620}
+.pi-world-center,.pi-entity-list,.pi-entity-detail,.pi-device-detail,.pi-platform-main{background:#121620}
+.pi-fleet-card{background:#191f2c}.pi-fleet-card.selected{background:#2b2940}
+.pi-skill{background:#19212d}.pi-skill:hover{background:#213136}
+.pi-node-title{font-size:17px}.pi-node-value{font-size:13px}
+.pi-pinned-count{display:inline-block;border:0;background:none;padding:8px 0;margin:3px 0 0;cursor:pointer;color:#baadcf;font:11px/1.4 Manrope,sans-serif;text-align:left}
+.pi-pinned-count:hover{color:#f1e6ff}
+.pi-pins-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:18px 0}
+.pi-pins-grid article{border:1px solid #ffffff18;border-radius:12px;padding:16px;background:#19222d}
+.pi-pins-grid h3{margin:10px 0 5px}.pi-pins-grid time{font:11px 'DM Mono',monospace;color:#9db2c7}
+.pi-pins-grid .pi-values{margin-top:12px}.pi-pins-grid p{font-size:12px;margin-bottom:0}
+@media(max-width:680px){.pi-pins-grid{grid-template-columns:1fr}}

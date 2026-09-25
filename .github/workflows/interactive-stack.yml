@@ -1,0 +1,54 @@
+name: Interactive stack acceptance
+on:
+  push:
+    branches: [interactive-stack-v3]
+  workflow_dispatch:
+    inputs:
+      full_missions:
+        description: Run complete city and factory mission acceptance
+        required: false
+        type: boolean
+        default: true
+permissions:
+  contents: read
+concurrency:
+  group: interactive-stack
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/upload-artifact@v4
+        with:
+          name: current-source
+          retention-days: 2
+          path: |
+            public/
+            scripts/
+            tests/
+            app/
+            package.json
+            next.config.ts
+            tsconfig.json
+            README.md
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install
+      - run: npx playwright install --with-deps chromium
+      - name: Presentation and live-state regression
+        run: |
+          npm run dev > /tmp/app.log 2>&1 &
+          for i in $(seq 1 70); do curl -sf http://localhost:3000/api/health >/dev/null && break || sleep 2; done
+          node tests/presentation-check.mjs
+      - name: Full mission acceptance
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.full_missions }}
+        run: node tests/interactive-check.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: interactive-verification
+          retention-days: 3
+          path: test-report/
