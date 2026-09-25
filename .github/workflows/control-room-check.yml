@@ -1,0 +1,35 @@
+name: Control room browser check
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['app/**', 'public/**', 'tests/control-room-check.mjs', '.github/workflows/control-room-check.yml', 'scripts/**', 'package.json']
+permissions:
+  contents: read
+concurrency:
+  group: control-room-check
+  cancel-in-progress: true
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install
+      - run: npx playwright install --with-deps chromium
+      - name: Start app
+        run: |
+          npm run dev > /tmp/app.log 2>&1 &
+          for i in $(seq 1 80); do curl -sf http://localhost:3000/api/health >/dev/null && break || sleep 2; done
+      - name: Check UI and execution
+        run: node tests/control-room-check.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: control-room-browser-report
+          path: |
+            test-report/
+            /tmp/app.log
