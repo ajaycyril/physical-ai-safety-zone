@@ -669,7 +669,7 @@ export class FallbackFacilitySim {
           this.robot.position.x+=dx/dist*step;this.robot.position.y+=dy/dist*step;
           this.battery=Math.max(18,this.battery-step*.02);
           const crateDist=Math.hypot(this.crate.position.x-this.robot.position.x,this.crate.position.y-this.robot.position.y);
-          if(crateDist<1.25&&this.arm1.rotation.y>-0.18){
+          if(crateDist<1.25&&this.arm1.rotation.y<-0.2){
             const mx=this.robot.position.x-oldX,my=this.robot.position.y-oldY;
             this.crate.position.x+=mx*.9;this.crate.position.y+=my*.9;
           }
