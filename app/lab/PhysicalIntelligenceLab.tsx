@@ -558,7 +558,7 @@ export default function PhysicalIntelligenceLab() {
   return (
     <>
       <header className={styles.header}>
-        <a className={styles.brand} href="/analog-product-thesis.html">
+        <a className={styles.brand} href="/physical-intelligence.html">
           <span className={styles.brandMark}>PI</span>
           <span>
             <b>PHYSICAL INTELLIGENCE LAB</b>
@@ -566,7 +566,7 @@ export default function PhysicalIntelligenceLab() {
           </span>
         </a>
         <nav>
-          <a href="/analog-product-thesis.html#system">Architecture</a>
+          <a href="/physical-intelligence.html#system">Architecture</a>
           <a href="/world-models.html">World Model</a>
           <a href="/robotics-stack.html">Robotics</a>
         </nav>
