@@ -5,11 +5,15 @@ for(const name of ['city','studio']){
  const path='public/'+name+'.html';let html=await fs.readFile(path,'utf8');
  html=html.replace(/<link rel="stylesheet" href="\/room\/(observatory|finishing)\.css">/g,'');
  if(!html.includes('/room/unified.css'))html=html.replace('</head>','<link rel="stylesheet" href="/room/unified.css"></head>');
+ if(!html.includes('/room/unified-clarity.css'))html=html.replace('</head>','<link rel="stylesheet" href="/room/unified-clarity.css"></head>');
  html=html.replace(/<script type="module"[^>]*>[\s\S]*?<\/script>/g,(tag)=>tag.includes('studio.js')?name==='city'?'<script type="module">import "/room/render-upgrade.js";import "/room/unified.js";await import("/room/city-studio.js");</script>':'<script type="module">import "/room/feedback.js";import "/room/presentation.js";import "/room/render-upgrade.js";import "/room/process-runtime.js";import "/room/unified.js";await import("/room/studio.js");</script>':tag);
  if(name==='city')html=html.replace('<script type="module" src="/room/city-studio.js"></script>','<script type="module">import "/room/render-upgrade.js";import "/room/unified.js";await import("/room/city-studio.js");</script>');
  if(name==='studio')html=html.replace('Authorize valve isolation?','Authorize the recovery?').replace('V-12 · 90° close · cooling skid only','V-12 close + SB-02 start. Isolate the duty circuit, then verify standby flow. Simulation only.');
  await fs.writeFile(path,html);
 }
+let ui=await fs.readFile('public/room/unified.js','utf8');
+ui=ui.replace("selection.disabled=!!s.plan&& !['COMPLETE','STOPPED','BLOCKED','READY','IDLE'].includes(s.status)","selection.disabled=!['COMPLETE','STOPPED','BLOCKED','READY','IDLE'].includes(s.status)");
+await fs.writeFile('public/room/unified.js',ui);
 let f=await fs.readFile('public/room/studio.js','utf8');
 const replace=(a,b)=>{if(f.includes(b))return;if(!f.includes(a))throw Error('Factory integration marker missing: '+a);f=f.replace(a,b);};
 replace("function openDetails(html){$('dialogBody').innerHTML=html;$('detailDialog').showModal();}","function openDetails(html){window.dispatchEvent(new CustomEvent('uc:details',{detail:{html}}));}");
