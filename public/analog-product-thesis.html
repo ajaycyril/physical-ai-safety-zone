@@ -16,6 +16,7 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/styles-a.css" />
   <link rel="stylesheet" href="/styles-b.css" />
+  <link rel="stylesheet" href="/architecture.css" />
   <title>Physical Intelligence, Made Operational — Ajay Cyril</title>
 </head>
 <body>
@@ -35,10 +36,10 @@
     </a>
     <nav class="desktop-nav" aria-label="Primary navigation">
       <a href="#thesis">Thesis</a>
-      <a href="#system">System</a>
-      <a href="#raas">RaaS</a>
+      <a href="#system">Architecture</a>
+      <a href="/world-models.html">World Model</a>
+      <a href="/robotics-stack.html">Robotics</a>
       <a href="#roadmap">Roadmap</a>
-      <a href="#fit">Fit</a>
     </nav>
     <a class="header-cta" href="#roadmap">View roadmap <span>↘</span></a>
     <div class="progress-track" aria-hidden="true"><div class="progress-bar" data-progress></div></div>
@@ -57,7 +58,7 @@
               <span class="title-line" data-shift="0.7">OPERATIONAL.</span>
             </h1>
             <div class="hero-bottom reveal">
-              <p class="hero-summary">A product thesis for turning world models, spatial context and robotics into a repeatable system of <strong>trusted state, governed action and verified outcomes.</strong></p>
+              <p class="hero-summary">A product thesis for an integrated Physical Intelligence stack: <strong>Ana → Hive → World Model → intelligence routing → robot edge → embodiment</strong>, governed by learning and trust planes.</p>
               <a class="pill-link" href="#thesis"><span>Enter the thesis</span><b>↓</b></a>
             </div>
           </div>
@@ -125,64 +126,82 @@
       </div>
     </section>
 
-    <section class="chapter system-section" id="system" aria-labelledby="system-title">
-      <div class="container section-heading centered">
-        <p class="eyebrow reveal">02 / THE PRODUCT SYSTEM</p>
-        <h2 id="system-title" class="section-title reveal">One system. <em>Four product layers.</em></h2>
-        <p class="section-intro reveal">The strategic value is created at the boundaries between the layers — not by allowing each to become a separate demonstration.</p>
+    <section class="architecture-section" id="system" aria-labelledby="system-title">
+      <div class="container architecture-heading">
+        <p class="eyebrow reveal">02 / THE ANALOG PHYSICAL INTELLIGENCE STACK</p>
+        <h2 id="system-title" class="section-title reveal">One stack. Two planes.<br /><em>Every layer has a job.</em></h2>
+        <div class="architecture-intro reveal">
+          <p>The product architecture should separate intent, operations, world state, robot intelligence, edge execution and hardware. That gives Analog freedom to change models and embodiments without breaking the customer operating layer.</p>
+          <strong>THE CORE PRODUCT MOVE<br/>OWN THE ABSTRACTIONS BETWEEN LAYERS.</strong>
+        </div>
       </div>
 
-      <div class="stack-stage" data-stack-stage>
-        <article class="system-card card-world" data-stack-card="0">
-          <div class="card-index">01</div>
-          <div class="card-content">
-            <p class="eyebrow">FOUNDATION</p>
-            <h3>World Model</h3>
-            <p>A sovereign, spatial and temporal representation of entities, relationships, history, state, uncertainty and available actions.</p>
-            <ul class="micro-list"><li>Identity & ontology</li><li>Spatial / temporal state</li><li>Provenance & confidence</li><li>Estate federation</li></ul>
-          </div>
-          <div class="card-visual graph-visual" aria-hidden="true">
-            <span class="graph-core">STATE</span><i class="g1"></i><i class="g2"></i><i class="g3"></i><i class="g4"></i><i class="g5"></i><i class="g6"></i>
-          </div>
-        </article>
+      <div class="architecture-stage">
+        <aside class="plane plane-learning reveal" data-parallax="-0.018" aria-label="Data and learning plane">
+          <span class="plane-label">DATA / LEARNING PLANE</span>
+          <h3>Every mission becomes training and evaluation data.</h3>
+          <ul><li>Teleop</li><li>Episodes</li><li>Simulation</li><li>Synthetic data</li><li>Evaluation</li><li>Fine tuning</li></ul>
+        </aside>
 
-        <article class="system-card card-hive" data-stack-card="1">
-          <div class="card-index">02</div>
-          <div class="card-content">
-            <p class="eyebrow">OPERATIONS</p>
-            <h3>Hive</h3>
-            <p>The governed orchestration layer that converts trusted state into workflows, missions, incidents, simulations and enterprise action.</p>
-            <ul class="micro-list"><li>Mission management</li><li>Cross-vendor orchestration</li><li>Work orders & incidents</li><li>Evidence & replay</li></ul>
-          </div>
-          <div class="card-visual hive-visual" aria-hidden="true"><div class="hex h1"></div><div class="hex h2"></div><div class="hex h3"></div><div class="hex h4"></div><span>HIVE</span></div>
-        </article>
+        <div class="stack-core" aria-label="Analog physical intelligence architecture">
+          <article class="stack-layer layer-ana reveal">
+            <div class="layer-top"><span class="layer-index">07 / INTENT</span><h3 class="layer-name">ANA</h3><span class="layer-link">↓</span></div>
+            <p class="layer-desc">Intent • Reasoning • Planning • Human interaction</p>
+            <div class="layer-tags"><span>GOAL DECOMPOSITION</span><span>EXPLANATION</span><span>HUMAN AUTHORITY</span><span>CONTEXT RETRIEVAL</span></div>
+          </article><div class="layer-bridge"><i></i></div>
 
-        <article class="system-card card-ana" data-stack-card="2">
-          <div class="card-index">03</div>
-          <div class="card-content">
-            <p class="eyebrow">INTERFACE</p>
-            <h3>Ana</h3>
-            <p>A grounded agent that interprets intent, retrieves estate context, plans, evaluates policy, compiles actions and explains every recommendation.</p>
-            <ul class="micro-list"><li>Grounded retrieval</li><li>Planning & explanation</li><li>Policy-aware actions</li><li>Human authority</li></ul>
-          </div>
-          <div class="card-visual ana-visual" aria-hidden="true"><div class="ana-head"><span></span></div><div class="ana-wave"></div></div>
-        </article>
+          <article class="stack-layer layer-hive reveal">
+            <div class="layer-top"><span class="layer-index">06 / OPERATIONS</span><h3 class="layer-name">HIVE</h3><span class="layer-link">↓</span></div>
+            <p class="layer-desc">Missions • Orchestration • Fleet • Workflows • Operations</p>
+            <div class="layer-tags"><span>MISSION CONTROL</span><span>FLEET</span><span>WORK ORDERS</span><span>EVIDENCE</span></div>
+          </article><div class="layer-bridge"><i></i></div>
 
-        <article class="system-card card-robotics" data-stack-card="3">
-          <div class="card-index">04</div>
-          <div class="card-content">
-            <p class="eyebrow">EXECUTION</p>
-            <h3>Robotics / RaaS</h3>
-            <p>The embodied execution and managed-service layer — robots, payloads, field operations, remote support, lifecycle and outcome SLAs.</p>
-            <ul class="micro-list"><li>Embodiment & payloads</li><li>Fleet & field service</li><li>Remote intervention</li><li>Outcome economics</li></ul>
-          </div>
-          <div class="card-visual robot-visual" aria-hidden="true"><div class="robot-body"></div><div class="robot-leg l1"></div><div class="robot-leg l2"></div><div class="robot-leg l3"></div><div class="robot-leg l4"></div><div class="robot-scan"></div></div>
-        </article>
+          <a class="stack-layer layer-world reveal" href="/world-models.html" aria-label="Open World Model deep dive">
+            <div class="layer-top"><span class="layer-index">05 / SHARED REALITY</span><h3 class="layer-name">ANALOG WORLD MODEL</h3><span class="layer-link">↗</span></div>
+            <p class="layer-desc">Spatial memory • Assets • People • Robots • Sensors • Semantic scene graph • History • Predicted future state</p>
+            <div class="layer-tags"><span>SPATIAL MEMORY</span><span>SCENE GRAPH</span><span>TEMPORAL STATE</span><span>PROVENANCE</span><span>PREDICTION</span></div>
+          </a><div class="layer-bridge"><i></i></div>
+
+          <a class="stack-layer layer-router reveal" href="/robotics-stack.html#router" aria-label="Open Robot Intelligence Router deep dive">
+            <div class="layer-top"><span class="layer-index">04 / INTELLIGENCE SELECTION</span><h3 class="layer-name">ROBOT INTELLIGENCE ROUTER</h3><span class="layer-link">↗</span></div>
+            <p class="layer-desc">GR00T • Gemini • Skild • FieldAI • OEM policy • Classical planning</p>
+            <div class="layer-tags"><span>MODEL ELIGIBILITY</span><span>CONFIDENCE</span><span>LATENCY</span><span>RISK</span><span>FALLBACK</span></div>
+          </a><div class="layer-bridge"><i></i></div>
+
+          <a class="stack-layer layer-edge reveal" href="/robotics-stack.html#runtime" aria-label="Open Robot Edge Runtime deep dive">
+            <div class="layer-top"><span class="layer-index">03 / EXECUTION ABSTRACTION</span><h3 class="layer-name">ANALOG ROBOT EDGE RUNTIME</h3><span class="layer-link">↗</span></div>
+            <p class="layer-desc">ROS 2 • Adapters • Local map • Safety • Skills • Offline behavior</p>
+            <div class="layer-tags"><span>ROS 2</span><span>SKILL RUNTIME</span><span>SAFETY SUPERVISOR</span><span>STORE + FORWARD</span></div>
+          </a><div class="layer-bridge"><i></i></div>
+
+          <a class="stack-layer reveal" href="/robotics-stack.html#stack" aria-label="Open OEM robot software deep dive">
+            <div class="layer-top"><span class="layer-index">02 / VENDOR CONTROL</span><h3 class="layer-name">OEM ROBOT SOFTWARE</h3><span class="layer-link">↗</span></div>
+            <p class="layer-desc">Spot SDK • Unitree • UR • FANUC • Drones • AMRs • Humanoids</p>
+            <div class="layer-tags"><span>OEM SDKs</span><span>BASE AUTONOMY</span><span>CONTROLLERS</span><span>PAYLOAD APIS</span></div>
+          </a><div class="layer-bridge"><i></i></div>
+
+          <a class="stack-layer layer-embodiment reveal" href="/robotics-stack.html#stack" aria-label="Open Embodiment layer deep dive">
+            <div class="layer-top"><span class="layer-index">01 / PHYSICAL WORLD</span><h3 class="layer-name">EMBODIMENT</h3><span class="layer-link">↗</span></div>
+            <p class="layer-desc">Robots • Drones • Cameras • Sensors • Actuators</p>
+            <div class="layer-tags"><span>MOBILITY</span><span>MANIPULATION</span><span>PERCEPTION</span><span>ACTUATION</span></div>
+          </a>
+        </div>
+
+        <aside class="plane plane-trust reveal" data-parallax="0.018" aria-label="Safety and trust plane">
+          <span class="plane-label">SAFETY / TRUST PLANE</span>
+          <h3>Authority and fail-safe behavior span the entire stack.</h3>
+          <ul><li>Identity</li><li>Permissions</li><li>Geofencing</li><li>Human approval</li><li>Audit</li><li>Fail-safe</li></ul>
+        </aside>
       </div>
 
-      <div class="truth-strip container reveal">
-        <span>PRODUCT DISCIPLINE</span>
-        <div><b>OBSERVED</b><i>≠</i><b>INFERRED</b><i>≠</i><b>PREDICTED</b><i>≠</i><b>SIMULATED</b><i>≠</i><b>AUTHORIZED</b><i>≠</i><b>VERIFIED</b></div>
+      <div class="container architecture-thesis reveal">
+        <span>ARCHITECTURAL PRINCIPLE</span>
+        <p>Ana should never directly “drive a robot.” Ana creates intent. Hive creates a governed mission. The World Model grounds the mission. The Router chooses intelligence. The Edge Runtime executes safely through the OEM layer.</p>
+      </div>
+
+      <div class="container deep-links">
+        <a class="deep-link-card reveal" href="/world-models.html"><small>TECHNICAL DEEP DIVE 01</small><h3>World Models</h3><p>Semantic scene graph, spatial memory, temporal state, provenance, prediction and the boundary between trusted reality and learned imagination.</p><b>↗</b></a>
+        <a class="deep-link-card reveal" href="/robotics-stack.html"><small>TECHNICAL DEEP DIVE 02</small><h3>Robotics as a Stack</h3><p>Robot Intelligence Router, ROS 2 edge runtime, OEM adapters, capability contracts, learning loop, safety plane and multi-embodiment strategy.</p><b>↗</b></a>
       </div>
     </section>
 
