@@ -1,0 +1,412 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#09080d" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="description" content="An independent product thesis for building the operating system for Physical Intelligence — prepared by Ajay Cyril." />
+  <meta property="og:title" content="Physical Intelligence, Made Operational — Ajay Cyril" />
+  <meta property="og:description" content="World Models, Hive, Robotics-as-a-Service and a roadmap from trusted state to accountable action." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="/og.svg" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles-a.css" />
+  <link rel="stylesheet" href="/styles-b.css" />
+  <link rel="stylesheet" href="/architecture.css" />
+  <title>Physical Intelligence, Made Operational — Ajay Cyril</title>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to the strategy</a>
+  <canvas id="fabric-canvas" aria-hidden="true"></canvas>
+  <div class="ambient ambient-one" data-parallax="-0.10" aria-hidden="true"></div>
+  <div class="ambient ambient-two" data-parallax="0.08" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
+
+  <header class="site-header" data-header>
+    <a class="brand" href="#top" aria-label="Back to top">
+      <span class="brand-mark" aria-hidden="true"><i></i><i></i></span>
+      <span class="brand-copy">
+        <strong>AJAY CYRIL</strong>
+        <small>PHYSICAL INTELLIGENCE / PRODUCT THESIS</small>
+      </span>
+    </a>
+    <nav class="desktop-nav" aria-label="Primary navigation">
+      <a href="#thesis">Thesis</a>
+      <a href="#system">Architecture</a>
+      <a href="/world-models.html">World Model</a>
+      <a href="/robotics-stack.html">Robotics</a>
+      <a href="/lab">Live System</a>
+      <a href="#roadmap">Roadmap</a>
+    </nav>
+    <a class="header-cta" href="/lab">Run live lab <span>↗</span></a>
+    <div class="progress-track" aria-hidden="true"><div class="progress-bar" data-progress></div></div>
+  </header>
+
+  <main id="main">
+    <section class="hero" id="top" aria-labelledby="hero-title">
+      <div class="hero-sticky">
+        <div class="hero-grid container">
+          <div class="hero-copy">
+            <p class="eyebrow reveal">AN INDEPENDENT STRATEGY PERSPECTIVE · SEPTEMBER 2026</p>
+            <h1 id="hero-title" class="hero-title" aria-label="Physical intelligence, made operational">
+              <span class="title-line" data-shift="-1">PHYSICAL</span>
+              <span class="title-line title-accent" data-shift="1">INTELLIGENCE</span>
+              <span class="title-line title-indent" data-shift="-0.65">MADE</span>
+              <span class="title-line" data-shift="0.7">OPERATIONAL.</span>
+            </h1>
+            <div class="hero-bottom reveal">
+              <p class="hero-summary">A product thesis for an integrated Physical Intelligence stack: <strong>Intent Agent → Mission Orchestrator → World State Engine → Policy Router → Robot Edge Runtime → Embodiment</strong>, governed by learning and trust planes.</p>
+              <div style="display:flex;gap:10px;flex-wrap:wrap"><a class="pill-link" href="#thesis"><span>Enter the thesis</span><b>↓</b></a><a class="pill-link" href="/lab"><span>Run live prototype</span><b>↗</b></a></div>
+            </div>
+          </div>
+
+          <div class="hero-object" aria-hidden="true" data-parallax="0.045">
+            <div class="orbit orbit-a"></div>
+            <div class="orbit orbit-b"></div>
+            <div class="orbit orbit-c"></div>
+            <div class="core-sphere">
+              <div class="sphere-glint"></div>
+              <span>TRUSTED<br />REALITY</span>
+            </div>
+            <div class="orbit-node node-one"><span>WORLD STATE</span></div>
+            <div class="orbit-node node-two"><span>ORCHESTRATOR</span></div>
+            <div class="orbit-node node-three"><span>INTENT AGENT</span></div>
+            <div class="orbit-node node-four"><span>ROBOTICS</span></div>
+          </div>
+        </div>
+
+        <div class="hero-rail" aria-hidden="true">
+          <span>OBSERVE</span><i></i><span>UNDERSTAND</span><i></i><span>SIMULATE</span><i></i><span>AUTHORIZE</span><i></i><span>ACT</span><i></i><span>VERIFY</span>
+        </div>
+        <div class="hero-watermark" aria-hidden="true">REALITY → ACTION</div>
+      </div>
+    </section>
+
+    <section class="chapter chapter-light loop-section" id="thesis" aria-labelledby="loop-title">
+      <div class="container loop-layout">
+        <div class="sticky-copy">
+          <p class="eyebrow dark reveal">01 / THE PRODUCT THESIS</p>
+          <h2 id="loop-title" class="section-title dark reveal">The moat is not a model.<br /><em>It is the closed loop.</em></h2>
+          <p class="section-intro dark reveal">Frontier models will commoditize. Robot hardware will diversify. Durable advantage comes from owning how reality is represented, how actions are governed and how outcomes return as evidence.</p>
+          <blockquote class="thesis-quote reveal">“Observe the physical world. Establish trusted state. Reason and simulate. Authorize action. Execute. Verify. Learn.”</blockquote>
+        </div>
+
+        <div class="loop-steps" aria-label="The Physical Intelligence closed loop">
+          <article class="loop-card reveal" data-loop-step="01">
+            <span class="loop-number">01</span>
+            <div><small>SENSE</small><h3>Observe</h3><p>Robots, cameras, IoT, BIM, GIS, SCADA, BMS and enterprise systems continuously report what is happening.</p></div>
+          </article>
+          <article class="loop-card reveal" data-loop-step="02">
+            <span class="loop-number">02</span>
+            <div><small>GROUND</small><h3>Trust</h3><p>Identity, time, location, source, provenance and confidence turn raw signals into authoritative operational state.</p></div>
+          </article>
+          <article class="loop-card reveal" data-loop-step="03">
+            <span class="loop-number">03</span>
+            <div><small>REASON</small><h3>Understand</h3><p>Rules, forecasts, probabilistic planning and learned models explain conditions and propose plausible futures.</p></div>
+          </article>
+          <article class="loop-card reveal" data-loop-step="04">
+            <span class="loop-number">04</span>
+            <div><small>GOVERN</small><h3>Authorize</h3><p>Policy, permissions, risk, human approval and safety constraints determine what may happen next.</p></div>
+          </article>
+          <article class="loop-card reveal" data-loop-step="05">
+            <span class="loop-number">05</span>
+            <div><small>ORCHESTRATE</small><h3>Act</h3><p>People, robots and software systems execute constrained missions through certified control layers.</p></div>
+          </article>
+          <article class="loop-card reveal" data-loop-step="06">
+            <span class="loop-number">06</span>
+            <div><small>PROVE</small><h3>Verify</h3><p>Evidence links action to asset, work order and outcome — then improves the next decision.</p></div>
+          </article>
+          <svg class="loop-line" viewBox="0 0 80 700" preserveAspectRatio="none" aria-hidden="true">
+            <path d="M42 0 C5 70 76 115 39 180 C2 245 77 300 40 365 C2 435 78 490 40 555 C5 615 72 655 40 700" />
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <section class="architecture-section" id="system" aria-labelledby="system-title">
+      <div class="container architecture-heading">
+        <p class="eyebrow reveal">02 / THE PHYSICAL INTELLIGENCE STACK</p>
+        <h2 id="system-title" class="section-title reveal">One stack. Two planes.<br /><em>Every layer has a job.</em></h2>
+        <div class="architecture-intro reveal">
+          <p>The product architecture should separate intent, operations, world state, robot intelligence, edge execution and hardware. That gives the platform freedom to change models and embodiments without breaking the customer operating layer.</p>
+          <strong>THE CORE PRODUCT MOVE<br/>OWN THE ABSTRACTIONS BETWEEN LAYERS.</strong>
+        </div>
+      </div>
+
+      <div class="architecture-stage">
+        <aside class="plane plane-learning reveal" data-parallax="-0.018" aria-label="Data and learning plane">
+          <span class="plane-label">DATA / LEARNING PLANE</span>
+          <h3>Every mission becomes training and evaluation data.</h3>
+          <ul><li>Teleop</li><li>Episodes</li><li>Simulation</li><li>Synthetic data</li><li>Evaluation</li><li>Fine tuning</li></ul>
+        </aside>
+
+        <div class="stack-core" aria-label="Physical Intelligence architecture">
+          <article class="stack-layer layer-ana reveal">
+            <div class="layer-top"><span class="layer-index">07 / INTENT</span><h3 class="layer-name">INTENT AGENT</h3><span class="layer-link">↓</span></div>
+            <p class="layer-desc">Intent • Reasoning • Planning • Human interaction</p>
+            <div class="layer-tags"><span>GOAL DECOMPOSITION</span><span>EXPLANATION</span><span>HUMAN AUTHORITY</span><span>CONTEXT RETRIEVAL</span></div>
+          </article><div class="layer-bridge"><i></i></div>
+
+          <article class="stack-layer layer-hive reveal">
+            <div class="layer-top"><span class="layer-index">06 / OPERATIONS</span><h3 class="layer-name">MISSION ORCHESTRATOR</h3><span class="layer-link">↓</span></div>
+            <p class="layer-desc">Missions • Orchestration • Fleet • Workflows • Operations</p>
+            <div class="layer-tags"><span>MISSION CONTROL</span><span>FLEET</span><span>WORK ORDERS</span><span>EVIDENCE</span></div>
+          </article><div class="layer-bridge"><i></i></div>
+
+          <a class="stack-layer layer-world reveal" href="/world-models.html" aria-label="Open World Model deep dive">
+            <div class="layer-top"><span class="layer-index">05 / SHARED REALITY</span><h3 class="layer-name">WORLD STATE ENGINE</h3><span class="layer-link">↗</span></div>
+            <p class="layer-desc">Spatial memory • Assets • People • Robots • Sensors • Semantic scene graph • History • Predicted future state</p>
+            <div class="layer-tags"><span>SPATIAL MEMORY</span><span>SCENE GRAPH</span><span>TEMPORAL STATE</span><span>PROVENANCE</span><span>PREDICTION</span></div>
+          </a><div class="layer-bridge"><i></i></div>
+
+          <a class="stack-layer layer-router reveal" href="/robotics-stack.html#router" aria-label="Open Robot Intelligence Router deep dive">
+            <div class="layer-top"><span class="layer-index">04 / INTELLIGENCE SELECTION</span><h3 class="layer-name">POLICY ROUTER</h3><span class="layer-link">↗</span></div>
+            <p class="layer-desc">GR00T • Gemini • Skild • FieldAI • OEM policy • Classical planning</p>
+            <div class="layer-tags"><span>MODEL ELIGIBILITY</span><span>CONFIDENCE</span><span>LATENCY</span><span>RISK</span><span>FALLBACK</span></div>
+          </a><div class="layer-bridge"><i></i></div>
+
+          <a class="stack-layer layer-edge reveal" href="/robotics-stack.html#runtime" aria-label="Open Robot Edge Runtime deep dive">
+            <div class="layer-top"><span class="layer-index">03 / EXECUTION ABSTRACTION</span><h3 class="layer-name">ROBOT EDGE RUNTIME</h3><span class="layer-link">↗</span></div>
+            <p class="layer-desc">ROS 2 • Adapters • Local map • Safety • Skills • Offline behavior</p>
+            <div class="layer-tags"><span>ROS 2</span><span>SKILL RUNTIME</span><span>SAFETY SUPERVISOR</span><span>STORE + FORWARD</span></div>
+          </a><div class="layer-bridge"><i></i></div>
+
+          <a class="stack-layer reveal" href="/robotics-stack.html#stack" aria-label="Open OEM robot software deep dive">
+            <div class="layer-top"><span class="layer-index">02 / VENDOR CONTROL</span><h3 class="layer-name">OEM ROBOT SOFTWARE</h3><span class="layer-link">↗</span></div>
+            <p class="layer-desc">Spot SDK • Unitree • UR • FANUC • Drones • AMRs • Humanoids</p>
+            <div class="layer-tags"><span>OEM SDKs</span><span>BASE AUTONOMY</span><span>CONTROLLERS</span><span>PAYLOAD APIS</span></div>
+          </a><div class="layer-bridge"><i></i></div>
+
+          <a class="stack-layer layer-embodiment reveal" href="/robotics-stack.html#stack" aria-label="Open Embodiment layer deep dive">
+            <div class="layer-top"><span class="layer-index">01 / PHYSICAL WORLD</span><h3 class="layer-name">EMBODIMENT</h3><span class="layer-link">↗</span></div>
+            <p class="layer-desc">Robots • Drones • Cameras • Sensors • Actuators</p>
+            <div class="layer-tags"><span>MOBILITY</span><span>MANIPULATION</span><span>PERCEPTION</span><span>ACTUATION</span></div>
+          </a>
+        </div>
+
+        <aside class="plane plane-trust reveal" data-parallax="0.018" aria-label="Safety and trust plane">
+          <span class="plane-label">SAFETY / TRUST PLANE</span>
+          <h3>Authority and fail-safe behavior span the entire stack.</h3>
+          <ul><li>Identity</li><li>Permissions</li><li>Geofencing</li><li>Human approval</li><li>Audit</li><li>Fail-safe</li></ul>
+        </aside>
+      </div>
+
+      <div class="container architecture-thesis reveal">
+        <span>ARCHITECTURAL PRINCIPLE</span>
+        <p>The Intent Agent never drives a robot directly. It creates intent and a plan. The Mission Orchestrator creates a governed mission. The World State Engine grounds it. The Policy Router selects execution. The Robot Edge Runtime acts safely through the OEM layer.</p>
+      </div>
+
+      <div class="container deep-links">
+        <a class="deep-link-card reveal" href="/world-models.html"><small>TECHNICAL DEEP DIVE 01</small><h3>World Models</h3><p>Semantic scene graph, spatial memory, temporal state, provenance, prediction and the boundary between trusted reality and learned imagination.</p><b>↗</b></a>
+        <a class="deep-link-card reveal" href="/robotics-stack.html"><small>TECHNICAL DEEP DIVE 02</small><h3>Robotics as a Stack</h3><p>Robot Intelligence Router, ROS 2 edge runtime, OEM adapters, capability contracts, learning loop, safety plane and multi-embodiment strategy.</p><b>↗</b></a>
+        <a class="deep-link-card deep-link-live reveal" href="/lab"><small>WORKING PROTOTYPE 03</small><h3>Live Physical Intelligence Lab</h3><p>Issue an intent to Ana and watch the whole loop run: grounded World Model state, Hive mission orchestration, policy routing, robot simulation, safety gates, evidence and episode replay.</p><b>▶</b></a>
+      </div>
+    </section>
+
+    <section class="chapter models-section" aria-labelledby="models-title">
+      <div class="container models-layout">
+        <div class="models-copy">
+          <p class="eyebrow reveal">03 / WORLD MODELS</p>
+          <h2 id="models-title" class="section-title reveal">Operational truth.<br /><em>Learned imagination.</em></h2>
+          <p class="section-intro reveal">“World model” names several different technologies. Product clarity starts by choosing the right representation for the decision, time horizon, uncertainty and action interface.</p>
+          <div class="model-principle reveal">
+            <span>THE PLATFORM SHOULD OWN</span>
+            <strong>Trusted reality, policy, workflow and evidence.</strong>
+          </div>
+          <div class="model-principle secondary reveal">
+            <span>THE PLATFORM SHOULD CONSUME</span>
+            <strong>Frontier simulation, foundation models and base autonomy.</strong>
+          </div>
+        </div>
+
+        <div class="model-map reveal" role="img" aria-label="Landscape of world-model approaches from operational truth to learned imagination and from state representation to action generation">
+          <div class="axis axis-y"><span>STATE</span><span>ACTION</span></div>
+          <div class="axis axis-x"><span>TRUSTED REALITY</span><span>LEARNED IMAGINATION</span></div>
+          <article class="model-dot m-operational" tabindex="0"><i></i><b>Operational semantic</b><small>Operational graph · Ontology · Digital twin</small></article>
+          <article class="model-dot m-physics" tabindex="0"><i></i><b>Physics simulation</b><small>Omniverse · Isaac Sim</small></article>
+          <article class="model-dot m-probabilistic" tabindex="0"><i></i><b>Probabilistic planning</b><small>VERSES-style systems</small></article>
+          <article class="model-dot m-latent" tabindex="0"><i></i><b>Latent prediction</b><small>V-JEPA · Dreamer</small></article>
+          <article class="model-dot m-generative" tabindex="0"><i></i><b>Generative worlds</b><small>Cosmos · Genie · Atlas</small></article>
+          <article class="model-dot m-action" tabindex="0"><i></i><b>VLA / action models</b><small>GR00T · Gemini · Helix</small></article>
+          <div class="map-glow" aria-hidden="true"></div>
+        </div>
+      </div>
+
+      <div class="container quote-panel reveal">
+        <p>THE STRATEGIC DISTINCTION</p>
+        <h3>“The World State Engine should hold trusted reality. Frontier models provide learned imagination.”</h3>
+      </div>
+    </section>
+
+    <section class="chapter chapter-light contracts-section" aria-labelledby="contracts-title">
+      <div class="container section-heading centered">
+        <p class="eyebrow dark reveal">04 / THE ORCHESTRATION CORE</p>
+        <h2 id="contracts-title" class="section-title dark reveal">Not another digital twin.<br /><em>Four contracts for action.</em></h2>
+        <p class="section-intro dark reveal">Multi-vendor robot telemetry is already a competitive market. Hive becomes defensible when it standardizes the meaning, permission and proof of physical action.</p>
+      </div>
+
+      <div class="contracts-orbit container reveal">
+        <div class="contract-center" aria-hidden="true"><span>MISSION</span><small>OPERATING<br />CONTRACTS</small></div>
+        <article class="contract-card c-state"><span>01</span><h3>State</h3><p>What is the entity, where is it, what state is valid, and what is the source and confidence?</p></article>
+        <article class="contract-card c-capability"><span>02</span><h3>Capability</h3><p>What can each robot, system or team do — with what payload, precision and operating envelope?</p></article>
+        <article class="contract-card c-policy"><span>03</span><h3>Policy</h3><p>Who may request, approve and execute an action — under what safety, privacy and jurisdiction rules?</p></article>
+        <article class="contract-card c-evidence"><span>04</span><h3>Evidence</h3><p>What proves the customer’s job is complete — not merely that a robot finished its route?</p></article>
+        <svg class="contract-lines" viewBox="0 0 1200 640" preserveAspectRatio="none" aria-hidden="true">
+          <ellipse cx="600" cy="320" rx="410" ry="230"></ellipse><ellipse cx="600" cy="320" rx="245" ry="135"></ellipse>
+        </svg>
+      </div>
+
+      <div class="container benchmark-row reveal">
+        <p>ORCHESTRATOR POSITIONING</p>
+        <div class="benchmark-flow"><span>SPATIAL CONTEXT</span><i>+</i><span>OPERATIONAL ONTOLOGY</span><i>+</i><span>ROBOT-NATIVE WORKFLOWS</span><i>+</i><span>SOVEREIGN GOVERNANCE</span><i>+</i><span>MANAGED OUTCOMES</span></div>
+      </div>
+    </section>
+
+    <section class="chapter raas-section" id="raas" aria-labelledby="raas-title">
+      <div class="container raas-layout">
+        <div class="raas-copy sticky-copy">
+          <p class="eyebrow reveal">05 / ROBOTICS-AS-A-SERVICE</p>
+          <h2 id="raas-title" class="section-title reveal">Customers do not buy robots.<br /><em>They buy reliable outcomes.</em></h2>
+          <p class="section-intro reveal">RaaS transfers deployment, uptime, maintenance, remote operations and technology-refresh risk from the customer to the provider.</p>
+          <div class="raas-equation reveal"><span>REVENUE</span><i>−</i><span>HARDWARE</span><i>−</i><span>SERVICE</span><i>−</i><span>INTERVENTIONS</span><i>=</i><strong>CONTRIBUTION</strong></div>
+        </div>
+
+        <div class="raas-stack" aria-label="Eight layers of a Robotics-as-a-Service offering">
+          <article class="raas-layer reveal"><span>08</span><div><small>COMMERCIAL & RISK</small><h3>Outcome SLA</h3><p>Availability, mission success, liability, pricing, insurance and refresh.</p></div></article>
+          <article class="raas-layer reveal"><span>07</span><div><small>MANAGED SERVICE</small><h3>Operate</h3><p>Deployment, maintenance, field response, remote assistance and reporting.</p></div></article>
+          <article class="raas-layer reveal"><span>06</span><div><small>ENTERPRISE WORKFLOW</small><h3>Resolve</h3><p>EAM, CMMS, ERP, work orders, command centres and compliance.</p></div></article>
+          <article class="raas-layer reveal"><span>05</span><div><small>WORLD CONTEXT</small><h3>Prioritize</h3><p>Asset identity, history, hazard state, criticality and mission context.</p></div></article>
+          <article class="raas-layer reveal"><span>04</span><div><small>FLEET OPERATIONS</small><h3>Orchestrate</h3><p>Mission scheduling, telemetry, health, charging, replay and incidents.</p></div></article>
+          <article class="raas-layer reveal"><span>03</span><div><small>SITE INTEGRATION</small><h3>Connect</h3><p>Networks, elevators, gates, maps, BMS, SCADA and cybersecurity.</p></div></article>
+          <article class="raas-layer reveal"><span>02</span><div><small>BASE AUTONOMY</small><h3>Navigate</h3><p>Localization, planning, collision avoidance, control and safe fallback.</p></div></article>
+          <article class="raas-layer reveal"><span>01</span><div><small>EMBODIMENT</small><h3>Sense & move</h3><p>Quadrupeds, drones, AMRs, payloads, docks and safety hardware.</p></div></article>
+        </div>
+      </div>
+
+      <div class="container metric-marquee reveal" aria-label="Key RaaS operating metrics">
+        <div class="marquee-track">
+          <span>ROBOT AVAILABILITY</span><i>✦</i><span>MISSION COMPLETION</span><i>✦</i><span>INTERVENTIONS / HOUR</span><i>✦</i><span>COST / MISSION</span><i>✦</i><span>MEAN TIME TO RECOVERY</span><i>✦</i><span>GROSS MARGIN / SITE</span><i>✦</i>
+          <span>ROBOT AVAILABILITY</span><i>✦</i><span>MISSION COMPLETION</span><i>✦</i><span>INTERVENTIONS / HOUR</span><i>✦</i><span>COST / MISSION</span><i>✦</i><span>MEAN TIME TO RECOVERY</span><i>✦</i><span>GROSS MARGIN / SITE</span><i>✦</i>
+        </div>
+      </div>
+    </section>
+
+    <section class="chapter roadmap-section" id="roadmap" aria-labelledby="roadmap-title">
+      <div class="container roadmap-heading">
+        <p class="eyebrow reveal">06 / PRODUCT ROADMAP</p>
+        <h2 id="roadmap-title" class="section-title reveal">Make truth reusable.<br />Make operations repeatable.<br /><em>Make intelligence compound.</em></h2>
+      </div>
+
+      <div class="roadmap container" data-roadmap>
+        <div class="roadmap-line" aria-hidden="true"><div data-roadmap-progress></div></div>
+        <article class="roadmap-phase reveal">
+          <div class="phase-time"><span>NOW</span><strong>0–6</strong><small>MONTHS</small></div>
+          <div class="phase-body">
+            <p class="eyebrow">PHASE 01</p><h3>Trust + one repeatable workflow</h3>
+            <div class="phase-grid"><div><small>BUILD</small><p>Canonical ontology, state classes, provenance, mission / policy / evidence contracts, one inspection template and real unit economics.</p></div><div><small>EXIT SIGNAL</small><p>The same mission and evidence model works across multiple sites, with traceable state and a measured customer outcome.</p></div></div>
+          </div>
+        </article>
+        <article class="roadmap-phase reveal">
+          <div class="phase-time"><span>NEXT</span><strong>6–18</strong><small>MONTHS</small></div>
+          <div class="phase-body">
+            <p class="eyebrow">PHASE 02</p><h3>Repeatability across estates</h3>
+            <div class="phase-grid"><div><small>BUILD</small><p>Estate templates, adapters, developer portal, partner certification, model gateway, simulation regression and governed cross-estate learning.</p></div><div><small>EXIT SIGNAL</small><p>Most implementation effort uses reusable product components; expansion comes from adding sites and workflows, not rebuilding.</p></div></div>
+          </div>
+        </article>
+        <article class="roadmap-phase reveal">
+          <div class="phase-time"><span>THEN</span><strong>18–36</strong><small>MONTHS</small></div>
+          <div class="phase-body">
+            <p class="eyebrow">PHASE 03</p><h3>Compounding autonomy</h3>
+            <div class="phase-grid"><div><small>BUILD</small><p>Domain action models, multi-agent planning, bounded closed loops, a partner marketplace, outcome-based contracts and federated intelligence.</p></div><div><small>EXIT SIGNAL</small><p>Every completed mission improves deployment speed, model quality, service margin and the defensibility of the platform.</p></div></div>
+          </div>
+        </article>
+      </div>
+
+      <div class="container wedge-panel reveal">
+        <div class="wedge-label">RECOMMENDED FIRST WEDGE</div>
+        <div class="wedge-copy"><h3>Autonomous inspection and assurance for critical and public-realm assets.</h3><p>Repeated, bounded, measurable missions create the cleanest path from demonstration to product — and from data collection to a proprietary learning loop.</p></div>
+        <div class="wedge-signal"><span>WHY NOW</span><b>High-value assets</b><b>Clear safety case</b><b>Recurring missions</b><b>Measurable ROI</b></div>
+      </div>
+    </section>
+
+    <section class="chapter chapter-light fit-section" id="fit" aria-labelledby="fit-title">
+      <div class="container fit-layout">
+        <div class="fit-copy">
+          <p class="eyebrow dark reveal">07 / WHY AJAY</p>
+          <h2 id="fit-title" class="section-title dark reveal">I have already built<br /><em>pieces of this loop.</em></h2>
+          <p class="section-intro dark reveal">My career has been about creating trustworthy digital abstractions of physical environments — then connecting them to accountable operational action.</p>
+        </div>
+
+        <div class="experience-arc reveal">
+          <article class="experience-card ex-tata">
+            <span class="experience-year">01</span>
+            <p class="eyebrow dark">TATA COMMUNICATIONS</p><h3>Trustworthy sensing</h3>
+            <p>Connected workers, industrial assets, wearables, RF reliability and enterprise safety workflows.</p>
+            <div class="experience-metric"><strong>150K+</strong><small>CONNECTED DEVICES</small><strong>60K+</strong><small>WORKERS</small></div>
+          </article>
+          <article class="experience-card ex-airtel">
+            <span class="experience-year">02</span>
+            <p class="eyebrow dark">AIRTEL</p><h3>Edge AI productization</h3>
+            <p>Turned cameras, edge inference, connectivity and safety events into scalable B2B and B2C propositions.</p>
+            <div class="experience-tag-row"><span>VISION AI</span><span>EDGE</span><span>PLATFORM</span><span>GTM</span></div>
+          </article>
+          <article class="experience-card ex-hassantuk">
+            <span class="experience-year">03</span>
+            <p class="eyebrow dark">HASSANTUK · e& UAE</p><h3>National-scale operations</h3>
+            <p>Regulated alarms, authority integration, device state, field operations, customer lifecycle and emergency accountability.</p>
+            <div class="experience-metric"><strong>90K+</strong><small>VILLAS</small><strong>1.5M+</strong><small>SENSORS</small></div>
+          </article>
+        </div>
+      </div>
+
+      <div class="container fit-statement reveal">
+        <div class="profile-glyph" aria-hidden="true"><span>AC</span><i></i><i></i><i></i></div>
+        <blockquote>“At Tata it was workers and industrial assets. At Airtel it was cameras and safety events. At Hassantuk it is national-scale homes, sensors, emergency workflows and authorities. Physical Intelligence is the next level of the same product problem.”</blockquote>
+      </div>
+
+      <div class="container ninety-day reveal" id="ninety-day">
+        <div class="ninety-heading"><p class="eyebrow dark">FIRST 90 DAYS</p><h3>Turn portfolio ambition into product truth.</h3></div>
+        <div class="ninety-grid">
+          <article><span>01–30</span><h4>Map reality</h4><p>Classify every deployment by maturity, user, architecture, measured outcome, reusable product and service burden.</p></article>
+          <article><span>31–60</span><h4>Define doctrine</h4><p>Set product boundaries, operating contracts, the repeatable wedge, north-star metric and roadmap exit criteria.</p></article>
+          <article><span>61–90</span><h4>Ship the loop</h4><p>Release one end-to-end inspection workflow: trusted state → approved mission → evidence → work order → measured outcome.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="finale" aria-labelledby="finale-title">
+      <div class="finale-orb" aria-hidden="true"><div></div></div>
+      <div class="container finale-content">
+        <p class="eyebrow reveal">THE OPPORTUNITY</p>
+        <h2 id="finale-title" class="reveal">Build the operating system<br />for the <em>physical world.</em></h2>
+        <p class="reveal">Own trusted reality. Orchestrate governed action. Prove the outcome. Let every mission make the platform stronger.</p>
+        <div class="finale-actions reveal">
+          <a class="primary-action" href="#top">Revisit the thesis <span>↑</span></a>
+          <button class="secondary-action" type="button" onclick="window.print()">Print strategy brief <span>↗</span></button>
+        </div>
+      </div>
+      <aside class="source-band container" id="research-basis" aria-label="Primary research basis">
+        <span>PRIMARY RESEARCH BASIS</span>
+        <div>
+          <a href="https://www.nvidia.com/en-us/ai/cosmos/" target="_blank" rel="noreferrer">NVIDIA Cosmos ↗</a>
+          <a href="https://www.nvidia.com/en-us/omniverse/" target="_blank" rel="noreferrer">Omniverse ↗</a>
+          <a href="https://www.palantir.com/docs/foundry/ontology/overview/" target="_blank" rel="noreferrer">Palantir Ontology ↗</a>
+          <a href="https://bostondynamics.com/products/orbit/" target="_blank" rel="noreferrer">Boston Dynamics Orbit ↗</a>
+        </div>
+      </aside>
+      <footer class="site-footer container">
+        <div><strong>AJAY CYRIL</strong><span>PRODUCT · AI · PHYSICAL INTELLIGENCE</span></div>
+        <p>Independent reference architecture and working prototype prepared for public technical discussion.</p>
+        <div class="footer-links"><a href="https://digdeeptech.com" target="_blank" rel="noreferrer">DigDeepTech</a><a href="#research-basis">Sources</a></div>
+      </footer>
+    </section>
+  </main>
+
+  <div class="cursor" aria-hidden="true"><span></span></div>
+  <script src="/script.js" defer></script>
+</body>
+</html>
