@@ -1,19 +1,35 @@
 {
   "name": "physical-intelligence-lab",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "private": true,
   "type": "module",
   "description": "A live physical-intelligence control room with browser vision, world state and simulated robotics.",
   "scripts": {
-    "dev": "node scripts/prepare-studio.mjs && node scripts/prepare-city.mjs && node scripts/prepare-portal.mjs && node scripts/prepare-experience.mjs && next dev",
-    "build": "node scripts/prepare-studio.mjs && node scripts/prepare-city.mjs && node scripts/prepare-portal.mjs && node scripts/prepare-experience.mjs && node --check public/room/studio.js && node --check public/room/city-studio.js && node --check public/room/city-scene.js && node --check public/room/city-vision.js && next build",
+    "dev": "node scripts/prepare-studio.mjs && node scripts/prepare-city.mjs && node scripts/prepare-portal.mjs && node scripts/prepare-unified.mjs && next dev",
+    "build": "node scripts/prepare-studio.mjs && node scripts/prepare-city.mjs && node scripts/prepare-portal.mjs && node scripts/prepare-unified.mjs && node --check public/room/studio.js && node --check public/room/city-studio.js && node --check public/room/city-scene.js && node --check public/room/city-vision.js && next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "test": "node --test tests/*.test.mjs",
-    "e2e": "node tests/interactive-check.mjs",
+    "e2e": "node tests/unified-check.mjs",
     "verify": "npm run typecheck && npm test && npm run build"
   },
-  "dependencies": {"next":"latest","react":"latest","react-dom":"latest","@mujoco/mujoco":"3.13.0","@mediapipe/tasks-vision":"1.0.1","three":"0.186.0"},
-  "overrides": {"postcss":"^8.5.10"},
-  "devDependencies": {"@types/node":"latest","@types/react":"latest","@types/react-dom":"latest","playwright":"^1.60.0","typescript":"latest","@types/three":"0.186.0"}
+  "dependencies": {
+    "next": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "@mujoco/mujoco": "3.13.0",
+    "@mediapipe/tasks-vision": "1.0.1",
+    "three": "0.186.0"
+  },
+  "overrides": {
+    "postcss": "^8.5.10"
+  },
+  "devDependencies": {
+    "@types/node": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "playwright": "^1.60.0",
+    "typescript": "latest",
+    "@types/three": "0.186.0"
+  }
 }

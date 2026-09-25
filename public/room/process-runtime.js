@@ -1,0 +1,65 @@
+import * as T from 'three';
+import {Facility} from './facility.js';
+const p=Facility.prototype;
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const note=(layer,text,detail={})=>window.dispatchEvent(new CustomEvent('plant:event',{detail:{layer,text,detail:{...detail,simulated:true}}}));
+let instance;
+const fresh=()=>({scenario:'recovery',duty:true,standbyTarget:0,standbyRPM:0,flow:18,temperature:82,vibration:7.6,transmitter:9.4,diagnosis:null,comparison:null,workOrder:null,events:0});
+const make=p.makeScene;
+p.makeScene=function(){make.call(this);instance=this;this.process=fresh();this.processHistory=[];this.processLast=0;this.processDecor=[];
+ const blue=this.mat(0x6598a8),metal=this.mat(0xa5b8c5),dark=this.mat(0x303c4c);
+ this.box(4.7,-1.6,.11,1.55,1.0,.2,dark);this.cyl(4.7,-1.6,.43,.3,.5,blue);this.cyl(4.7,-1.6,.78,.18,.19,metal);this.pipe([4.7,-1.6,.65],[4.7,.05,.65],.065,blue);
+ this.standbyRotor=new T.Group();this.standbyRotor.position.set(4.7,-1.6,.9);this.scene.add(this.standbyRotor);for(let i=0;i<4;i++){const blade=this.box(0,0,0,.48,.045,.03,metal,this.standbyRotor);blade.rotation.z=i*Math.PI/4;}
+ this.dutyLamp=this.mesh(new T.SphereGeometry(.07,14,10),new T.MeshBasicMaterial({color:0xedb878}),[4.55,.05,.79]);
+ this.standbyLamp=this.mesh(new T.SphereGeometry(.07,14,10),new T.MeshBasicMaterial({color:0x3b4d59}),[4.3,-1.6,.58]);
+ // An animated conveyor is scene context, not video-derived machine control.
+ this.box(-4.2,1.4,1.025,1.95,.82,.08,dark);this.packages=[];
+ for(let i=0;i<4;i++)this.packages.push(this.box(-4.9+i*.48,1.4,1.2,.32,.48,.28,0xab9676));
+ this.fluidDots=[];for(let i=0;i<7;i++)this.fluidDots.push(this.mesh(new T.SphereGeometry(.025,8,6),new T.MeshBasicMaterial({color:0x9ff1da}),[4.7,.05,.66]));
+ this.scene.traverse(o=>o.layers?.enable(1));this.robot.traverse(o=>o.layers?.disable(1));
+};
+const tick=p.tick;
+p.tick=function(dt){const previous=this.state.pressure;tick.call(this,dt);if(!this.process||this.holds.size)return;const a=this.process,closed=this.state.valve>1.2,normal=a.scenario==='instrument';
+ a.standbyRPM+=(a.standbyTarget-a.standbyRPM)*Math.min(1,dt/1.5);
+ const equilibrium=a.standbyRPM>.2?4.8:closed?3.2:normal?5.4:10.4;
+ this.state.pressure=previous+(equilibrium-previous)*Math.min(1,dt/(closed||normal?4:15));
+ const targetFlow=a.standbyRPM>.1?58*a.standbyRPM:closed?0:normal?54:18;
+ a.flow+=(targetFlow-a.flow)*Math.min(1,dt/2.2);
+ a.temperature+=((a.standbyRPM>.7?49:closed?62:normal?53:86)-a.temperature)*Math.min(1,dt/9);
+ a.vibration+=((closed?.7:normal?1.5:8.2)-a.vibration)*Math.min(1,dt/2);
+ a.transmitter=this.state.pressure+(normal?3.0:0);
+ if(this.state.t-this.processLast>.4){this.processLast=this.state.t;this.processHistory.push({t:this.state.t,pressure:this.state.pressure,flow:a.flow,temperature:a.temperature,vibration:a.vibration,transmitter:a.transmitter});if(this.processHistory.length>450)this.processHistory.shift();}
+};
+const render=p.renderState;
+p.renderState=function(s){render.call(this,s);if(!this.process)return;const a=this.process;
+ this.standbyRotor.rotation.z+=a.standbyRPM*.18;this.standbyLamp.material.color.setHex(a.standbyRPM>.7?0x85edc7:0x3b4d59);this.dutyLamp.material.color.setHex(s.valve>1.2?0x64747e:0xf1bd81);
+ for(let i=0;i<this.packages.length;i++){const b=this.packages[i];b.position.x=-5.1+((s.t*.13+i*.49)%1.95);}
+ for(let i=0;i<this.fluidDots.length;i++){const dot=this.fluidDots[i];dot.visible=a.flow>3;dot.position.y=-1.6+((s.t*.45+i*.23)%1.65);dot.material.color.setHex(a.standbyRPM>.7?0x93edcf:0xf4c184);}
+};
+const snap=p.snapshot;
+p.snapshot=function(){const s=snap.call(this);const {comparison,...summary}=this.process||{};return{...s,process:JSON.parse(JSON.stringify(summary))};};
+p.chooseScenario=function(key){this.reset();this.process.scenario=key;if(key==='instrument'){this.state.pressure=5.4;this.process.temperature=53;this.process.flow=54;this.process.vibration=1.5;this.process.transmitter=8.4;}note('SCENARIO',key==='instrument'?'Instrument-disagreement case loaded. No actuation scope.':'Cooling recovery case loaded. Duty circuit fault is simulated.',{scenario:key});};
+const reset=p.reset;
+p.reset=function(...args){reset.apply(this,args);this.process=fresh();this.processHistory=[];this.processLast=0;};
+p.compareResponse=function(){const s=this.state,a=this.process;const isolated=[],backup=[];let x=s.pressure,y=x,flow=a.flow;for(let i=0;i<41;i++){isolated.push({t:i*.5,pressure:x,flow:Math.max(0,a.flow*Math.exp(-i*.5/2.2))});backup.push({t:i*.5,pressure:y,flow});x+=(3.2-x)*.5/4;y+=(4.8-y)*.5/4;flow+=(58-flow)*.5/2.2;}return{horizon:20,isolate:isolated,standby:backup,method:'Cloned first-order process models. Same starting state; isolate only vs isolate + standby.',basis:'SIMULATED PREDICTION'};};
+const inspect=p.inspect;
+p.inspect=async function(signal){const reading=await inspect.call(this,signal),a=this.process;
+ const disagreement=Math.abs(a.transmitter-reading.value),checks={gaugeAboveLimit:reading.value>8,transmitterAboveLimit:a.transmitter>8,restrictedFlow:a.flow<25,vibrationHigh:a.vibration>6,sensorsAgree:disagreement<.8};
+ a.diagnosis={cause:!checks.sensorsAgree?'Pressure transmitter disagreement':checks.gaugeAboveLimit&&checks.restrictedFlow&&checks.vibrationHigh?'Duty circuit restriction':'Inspection required',checks,disagreementBar:disagreement,source:'Rules over simulated process sensors + calibrated rendered gauge pixels'};
+ a.workOrder={id:'WO-'+Date.now().toString().slice(-6),asset:checks.sensorsAgree?'P-204':'PT-204',status:'Open / diagnostic evidence attached',createdAt:new Date().toISOString()};
+ note('DIAGNOSIS',a.diagnosis.cause,{checks,gauge:reading.value,transmitter:a.transmitter,flow:a.flow,vibration:a.vibration,temperature:a.temperature});
+ note('WORK ORDER',a.workOrder.id+' opened; evidence linked.',{...a.workOrder});
+ a.comparison=this.compareResponse();note('ROLLOUT','Compared isolate-only with standby recovery.',{comparison:a.comparison,selected:checks.sensorsAgree?'Isolate + standby, subject to approval':'No actuation; inspect transmitter'});
+ await this.wait(900,signal);return reading;
+};
+const isolate=p.isolate;
+p.isolate=async function(signal){const permit=window.__room?.state().events?.findLast(e=>e.layer==='APPROVAL');if(!permit||!String(permit.detail?.scope).includes('SB-02:start'))throw Error('Scoped standby authority is missing');
+ const angle=await isolate.call(this,signal);this.process.duty=false;
+ note('INTERLOCK','Duty circuit closed; zero-feed condition confirmed.',{valveRadians:angle,threshold:1.45});
+ await this.wait(500,signal);this.process.standbyTarget=1;note('ADAPTER','SB-02 start requested under the same permit.',{scope:'SB-02:start',targetRPM:1});
+ document.getElementById('skillLabel').textContent='Start standby · verify flow';
+ await this.reach(()=>this.process.standbyRPM>.9&&this.process.flow>45&&this.state.pressure<7.8,'standby flow recovery',signal);
+ this.process.workOrder.status='Contained / duty circuit maintenance pending';
+ note('RECOVERY','Standby supply recovered; duty circuit remains isolated.',{rpm:this.process.standbyRPM,flow:this.process.flow,pressure:this.state.pressure,workOrder:this.process.workOrder});return angle;
+};
+window.__plant={snapshot:()=>instance?.snapshot(),history:()=>instance?.processHistory||[],scenario:key=>instance?.chooseScenario(key),comparison:()=>instance?.compareResponse()};
