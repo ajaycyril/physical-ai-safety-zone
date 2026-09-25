@@ -171,7 +171,7 @@
   }
 
   function renderRouter(selected){
-    const opts=[["CLASSICAL NAV","Classical Nav + OEM locomotion"],["GEMINI ROBOTICS ER 2","Gemini Robotics ER 2"],["ISAAC GR00T","Isaac GR00T"],["SKILD S1","Skild S1"],["OEM POLICY","OEM Policy"]];
+    const opts=[["CLASSICAL NAV","Classical Nav + OEM locomotion"],["GEMINI ROBOTICS ER 2","Gemini Robotics ER 2"],["ISAAC GR00T 1.7","Isaac GR00T 1.7"],["SKILD S1","Skild S1"],["OEM POLICY","OEM Policy"]];
     d.routerOptions.innerHTML=opts.map(([label,key])=>'<div class="'+(selected===key?"selected":"")+'"><span>'+label+"</span><b>"+(selected===key?"SELECTED":key.includes("Classical")||key==="OEM Policy"?"ELIGIBLE":"STANDBY")+"</b></div>").join("");
   }
 
