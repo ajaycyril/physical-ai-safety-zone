@@ -1,12 +1,12 @@
 {
-  "name": "physical-ai-safety-zone",
+  "name": "physical-intelligence-lab",
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Physical AI safety-zone demo using roboflow/supervision on the edge and a Vercel-hosted control dashboard.",
+  "description": "A public Physical Intelligence reference architecture and live browser robotics lab.",
   "scripts": {
     "dev": "next dev",
-    "build": "node --check public/script.js && node --check public/live-system.js && next build",
+    "build": "node --check public/script.js && next build",
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
