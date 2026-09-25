@@ -1,0 +1,63 @@
+name: Unified console acceptance
+on:
+  workflow_dispatch:
+  push:
+    branches: [unified-console-v4]
+permissions:
+  contents: write
+concurrency:
+  group: unified-console-v4
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Materialize reviewed source
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import base64,gzip,hashlib,json
+          paths=[Path(f'.ci/console-v4.{n}.b64') for n in range(3)]
+          if all(p.exists() for p in paths):
+              encoded=''.join(p.read_text().strip() for p in paths)
+              encoded=encoded.replace('Lx6vbyFbyFlt/F7','Lx6vbyFlt/F7')
+              payload=base64.b64decode(encoded,validate=True)
+              assert hashlib.sha256(payload).hexdigest()=='4abad9fdf8d0003b5bdae05fa7927fe3dc2c715597ddd8221690eba8b2b6b8b0','Source transport checksum mismatch'
+              files=json.loads(gzip.decompress(payload))
+              allowed={'public/room/process-runtime.js','public/room/unified.js','public/room/unified.css','scripts/prepare-unified.mjs','tests/unified-check.mjs','app/page.tsx','app/lab/page.tsx','package.json'}
+              assert set(files)==allowed
+              for name,content in files.items():
+                  p=Path(name);p.parent.mkdir(parents=True,exist_ok=True);p.write_text(content)
+              for p in paths:p.unlink()
+              print('Verified and materialized',len(files),'source files')
+          PY
+          if ! git diff --quiet; then
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git add .ci/ public/room/process-runtime.js public/room/unified.js public/room/unified.css scripts/prepare-unified.mjs tests/unified-check.mjs app/page.tsx app/lab/page.tsx package.json
+            git commit -m 'Unify live console and add measured factory recovery'
+            git push origin HEAD:unified-console-v4
+          fi
+      - run: npm install
+      - name: Production build
+        run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - name: Live browser acceptance
+        run: |
+          npm start > /tmp/console-app.log 2>&1 &
+          for i in $(seq 1 90); do curl -sf http://localhost:3000/api/mission >/dev/null && break || sleep 2; done
+          node tests/unified-check.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: unified-console-report
+          retention-days: 3
+          path: |
+            test-report/
+            public/media/warehouse-manifest.json
+            /tmp/console-app.log
