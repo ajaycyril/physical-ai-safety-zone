@@ -1,0 +1,25 @@
+/* Inspector layers never cross-fade over live values. The scene stays interactive. */
+.unified-console .uc-approval-slot .approval,
+.unified-console .uc-prediction-slot .prediction,
+.unified-console .uc-popover {
+  animation:none!important;
+  opacity:1!important;
+  transform:none!important;
+  filter:none!important;
+  backdrop-filter:none!important;
+  isolation:isolate;
+}
+.unified-console .uc-approval-slot .approval {background:#212334!important;z-index:2}
+.unified-console .uc-prediction-slot .prediction {background:#182433!important;z-index:1}
+.unified-console .uc-popover {background:#151e2a!important}
+.unified-console .uc-inspector:has(.uc-approval-slot .approval:not([hidden]))>.uc-inspector-content,
+.unified-console .uc-inspector:has(.uc-prediction-slot .prediction:not([hidden]))>.uc-inspector-content {visibility:hidden;pointer-events:none}
+.unified-console .brief form {max-width:none;min-width:0;width:100%}
+.unified-console .scene-footer>div:first-child,
+.unified-console .scene-bottom>div:first-child {min-width:0;flex:1}
+.unified-console .scene-footer strong,
+.unified-console .scene-bottom strong {display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.unified-console .scene-footer .controls,
+.unified-console .scene-bottom .scene-actions {flex-shrink:0}
+.unified-console .uc-scenarios select:disabled {opacity:.65;cursor:progress}
+.unified-console .uc-popup-body {overscroll-behavior:contain}
