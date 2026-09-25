@@ -1,252 +1,65 @@
-# Physical Intelligence Lab
+# Physical Intelligence / control room
 
-A public, working reference implementation for a **Physical Intelligence operating stack**: grounded intent, world state, mission orchestration, policy routing, robot-edge safety, browser physics, live camera perception, and evidence replay.
+A single-screen demonstration of camera perception, world state, mission orchestration and robot execution.
 
-**Live site:** https://next-project-to-show-physical-ai.vercel.app  
-**Live robotics lab:** https://next-project-to-show-physical-ai.vercel.app/lab  
-**World State deep dive:** https://next-project-to-show-physical-ai.vercel.app/world-models.html  
-**Robotics Stack deep dive:** https://next-project-to-show-physical-ai.vercel.app/robotics-stack.html
+**Site:** https://next-project-to-show-physical-ai.vercel.app  
+**Control room:** https://next-project-to-show-physical-ai.vercel.app/studio.html
 
-## The thesis
+## Run the task
 
-Robot hardware and frontier models will keep changing. The durable product layer is the operating loop that connects human intent to trusted physical state, governed missions, safe execution, and verified outcomes.
+Click **Run mission**. Follow the bottom workflow and the active layer on the left. Approve the scoped valve action when requested. The robot navigates, scans an instrument, performs a valve sequence, verifies the resulting state and returns to its dock.
 
-```text
-Intent Agent
-    ↓
-Mission Orchestrator
-    ↓
-World State Engine
-    ↓
-Policy Router
-    ↓
-Robot Edge Runtime
-    ↓
-OEM Runtime
-    ↓
-Embodiment
+Switch to **Architecture** to inspect each layer's components and input/output contract. **Trace a sample task** animates the handoffs without executing a mission.
 
-↕ Data / Learning Plane
-↕ Safety / Trust Plane
-```
+## What is real, and what is simulated
 
-The live lab implements that loop rather than only diagramming it.
+| Component | Implementation |
+|---|---|
+| Factory video | Self-hosted, recorded footage. Not a live factory feed. |
+| Person detection | MediaPipe EfficientDet Lite0 evaluates actual video frames in the browser. Scores are model outputs. |
+| Camera-to-world binding | An operator-selected image region is mapped to the demo aisle. This is not automatic metric 3D reconstruction. |
+| Mission planning | Bounded rule-based Next.js compiler using current world state. No LLM dependency. |
+| Navigation | A* grid planning, obstacle inflation, waypoint execution and local feedback. |
+| Robot dynamics | MuJoCo WebAssembly, named joints and position actuators. The mobile base is planar constrained; wheel visuals use odometry. |
+| Arm and valve | Joint-space inspection and valve skills. Valve interaction is simulated actuator I/O, not learned grasping or contact-transferred manipulation. |
+| Plant pressure | A modeled first-order response to the simulated valve's feedback. Not a reading extracted from the factory footage. |
+| Gauge vision | Calibrated needle-pixel analysis on a synthetic instrument. Classical computer vision, not a neural model. |
+| Wrist camera | A second rendered camera into the same simulated scene. |
+| Safety | Local stop, pause, cancellation, route constraints and scoped approval. Simulation only; no functional-safety certification. |
+| Evidence | Timestamped events, source observations and recorded joint/pose snapshots. Local storage, JSON export and state replay. |
 
-## What is actually running
+The factory observation affects route selection. Missing or stale camera evidence is treated as unknown, not as proof that an area is clear.
 
-### 1. Browser robot physics
+## Stack
 
-The primary simulator uses the official Google DeepMind **MuJoCo JavaScript/WebAssembly bindings** with a Three.js renderer.
+Intent → mission control → world state → policy router → local runtime → simulation adapter → physical world.
 
-The MJCF scene contains:
+Safety and evidence cross all layers. The interface separates observations, policy decisions, actions and verified feedback.
 
-- planar mobile robot R-07,
-- articulated two-joint arm and pusher,
-- Pump P-204,
-- Valve V-12,
-- a controlled operating zone,
-- free-body crate PL-9,
-- staging bay S-3,
-- walls, contacts, friction, gravity, actuators, and local motor control.
-
-Navigation is closed-loop. Robot pose is read back from MuJoCo state. PL-9 is a free body and the manipulation sequence moves it through physical contact.
-
-MuJoCo JS bindings: https://github.com/google-deepmind/mujoco/tree/main/wasm
-
-A deterministic Three.js fallback is intentionally included for demo resilience. The UI explicitly reports which runtime is active; it never labels the fallback as MuJoCo.
-
-### 2. Intent Agent
-
-The operator writes an operational request such as:
-
-> Inspect Pump P-204, verify Valve V-12, recover crate PL-9 to staging bay S-3 if the aisle is clear, and return to dock. Stop locally if the safety camera detects a person.
-
-The browser sends the intent together with the current world snapshot to `/api/agent`.
-
-The mission compiler returns:
-
-- grounded world assessment,
-- tool surface,
-- executable mission steps,
-- selected execution policies,
-- safety requirements,
-- approval boundaries.
-
-The current implementation is deterministic by design so the demo has no model/API-key dependency. The agent interface is intentionally separable from the execution stack so a frontier reasoning model can later sit behind the same tool contract without changing robot control.
-
-### 3. Live World State Engine
-
-The world view fuses state from multiple sources:
-
-| Entity | Live source |
-| --- | --- |
-| R-07 robot pose | MuJoCo body state |
-| PL-9 crate pose | MuJoCo free-body state |
-| P-204 thermal condition | simulated sensor observation |
-| V-12 verification state | mission evidence |
-| CAM-01 person state | MediaPipe browser inference |
-| Mission state | Mission Orchestrator |
-| Safety state | local safety policy |
-
-The interface distinguishes **observed**, **verified**, **planned**, and **authorized** state and renders the current relationships as a semantic scene graph.
-
-### 4. Mission Orchestrator
-
-A compiled intent becomes a stateful mission rather than a direct robot command.
-
-Typical mission:
-
-```text
-world.query
-→ navigate P-204
-→ inspect P-204
-→ navigate V-12
-→ verify V-12
-→ navigate PL-9
-→ manipulate PL-9 → S-3
-→ return DOCK
-→ evidence.commit
-```
-
-The orchestrator owns mission progress, approvals, evidence, and end-to-end traceability.
-
-### 5. Policy Router
-
-Execution is deliberately heterogeneous.
-
-The reference router demonstrates the boundary between:
-
-- deterministic local navigation,
-- vision-language inspection,
-- embodied manipulation policy,
-- OEM low-level control.
-
-The architecture is designed so robotics foundation models can be plugged behind these contracts without coupling the customer workflow to one model vendor.
-
-### 6. Robot Edge Runtime and safety
-
-Safety remains below the reasoning layer.
-
-The edge/runtime boundary demonstrates:
-
-- local motion authority,
-- pause / resume,
-- controlled-zone approval,
-- human-yield behavior,
-- safe stopping independent of the mission planner.
-
-A cloud agent is never treated as an emergency stop.
-
-### 7. Real browser camera stream
-
-The lab can open the user’s webcam with `getUserMedia()`.
-
-MediaPipe Pose Landmarker runs **in the browser** and derives person presence. Raw video is not uploaded by this demo.
-
-MediaPipe Tasks Vision: https://ai.google.dev/edge/mediapipe/solutions/vision/pose_landmarker/web_js
-
-When **Bind to Safety Zone** is enabled, live person presence becomes world state and can pause robot motion locally while a mission is executing.
-
-### 8. Evidence and learning loop
-
-The system trace records:
-
-- grounded state,
-- mission steps,
-- selected policies,
-- robot actions,
-- physics outcomes,
-- safety interventions,
-- approvals,
-- observations and verification events.
-
-At mission completion the trace is treated as a replayable episode for evaluation and future learning.
-
-## Technology stack
-
-- Next.js 16 / React
-- Vercel
-- TypeScript
-- Google DeepMind MuJoCo JS/WASM
-- Three.js
-- MediaPipe Tasks Vision
-- browser `getUserMedia`
-- server-side Next route handlers
-- static high-performance strategy/deep-dive pages
-
-## Run locally
-
-Requirements:
-
-- Node.js 20+
-- a modern Chromium/Safari browser with WebGL
-- HTTPS or localhost for camera access
+## Development
 
 ```bash
 npm install
 npm run dev
 ```
 
-Open:
+Open `http://localhost:3000/studio.html`.
 
-```text
-http://localhost:3000
-http://localhost:3000/lab
-```
-
-Production build:
+`prepare-studio.mjs` self-hosts the MuJoCo, Three.js and MediaPipe runtime assets, downloads the detection model and prepares the sample footage. A manifest records whether each asset was retrieved.
 
 ```bash
 npm run build
-npm start
+npm run e2e
 ```
 
-## Demo sequence
+The browser workflow captures screenshots, checks desktop fit, exercises a complete mission, and records runtime state and errors. Browser evidence—not an HTTP 200 alone—is the acceptance check.
 
-For the strongest end-to-end walkthrough:
+## Media and tools
 
-1. Open the architecture page and explain the layer separation.
-2. Open **Live Lab**.
-3. Confirm the top-left runtime reads `MuJoCo ... live dynamics`.
-4. Click **Start Live Camera** and allow camera access.
-5. Enable **Bind to Safety Zone**.
-6. Compile the default mission.
-7. Dispatch it.
-8. Watch R-07 physically navigate in the 3D scene.
-9. Approve controlled-zone entry.
-10. Approve crate manipulation.
-11. Watch the articulated robot push PL-9 toward S-3.
-12. During motion, step into the webcam view to demonstrate local human-yield safety.
-13. Clear the camera and let the mission continue.
-14. Open the World / Mission / Policy / Learning tabs and show the full trace.
+- [Factory sample: Man working on conveyor machine](https://www.pexels.com/video/man-working-on-conveyor-machine-855091/) — Pixabay / Pexels, CC0.
+- [Gauge reference clip](https://www.pexels.com/video/a-gauge-use-to-measure-quantity-and-weight-2853796/) — K / Pexels, Pexels License. Downloaded as a reference, not used to claim a real plant-pressure reading.
+- [MuJoCo WebAssembly](https://github.com/google-deepmind/mujoco/tree/main/wasm)
+- [MediaPipe browser object detection](https://ai.google.dev/edge/mediapipe/solutions/vision/object_detector/web_js)
+- [Three.js](https://threejs.org/)
 
-## Architecture principles
-
-- **Intent is not actuation.**
-- **The world model owns trusted state, not imagined truth.**
-- **Mission orchestration owns workflow and evidence.**
-- **Policy selection is pluggable.**
-- **Safety authority lives below reasoning.**
-- **Robot/OEM diversity is hidden behind stable capability contracts.**
-- **Every mission returns evidence and learning data.**
-
-## Transparency
-
-This is a reference implementation and product thesis, not a claim that every frontier robotics model shown in the architecture is running inside the browser.
-
-What is real in the live lab:
-
-- browser physics runtime,
-- 3D robot movement,
-- articulated manipulation,
-- mutable world state,
-- mission compiler,
-- orchestration state machine,
-- policy routing,
-- safety approvals,
-- live camera input,
-- on-device person detection,
-- safety binding,
-- event/evidence trace.
-
-The goal is to make the interfaces between a production Physical Intelligence stack tangible and executable.
+Camera access is opt-in. Raw webcam frames are not uploaded. There is no connection to real machinery.
