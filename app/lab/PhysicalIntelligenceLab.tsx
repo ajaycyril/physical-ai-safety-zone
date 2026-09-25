@@ -453,22 +453,22 @@ export default function PhysicalIntelligenceLab() {
       if (step.action === "manipulate") {
         const approved = await requestApproval(
           "Authorize physical manipulation",
-          "The robot will use its articulated pusher and MuJoCo contact dynamics to relocate PL-9. The action is bounded to the staging lane.",
+          "The robot will use its articulated pusher and the active physics runtime to relocate PL-9. The action is bounded to the staging lane.",
         );
         if (!approved) throw new Error("Manipulation denied by operator.");
 
         const crate = sim.getSnapshot().crate;
         appendEvent("EDGE", "Approaching PL-9 from the free side.");
-        await sim.moveTo(crate.x - 1.05, crate.y, 0.8);
-        await sim.setArmAndWait(-0.04, 0.06, 900);
-        appendEvent("PHYSICS", "End effector extended. Contact-driven push sequence started.", "good");
-        await sim.moveTo(3.08, -2.28, 0.52);
+        await sim.moveTo(crate.x - 1.43, crate.y, 0.8);
+        await sim.setArmAndWait(-0.30, 0.30, 900);
+        appendEvent("PHYSICS", "End effector lowered into the crate contact plane. Contact-driven push sequence started.", "good");
+        await sim.moveTo(2.24, -2.30, 0.46);
         await sleep(350);
         await sim.setArmAndWait(-0.18, 0.48, 600);
         const after = sim.getSnapshot().crate;
         appendEvent(
           "WORLD",
-          `PL-9 free-body pose updated from MuJoCo: x=${after.x.toFixed(2)}, y=${after.y.toFixed(2)}.`,
+          `PL-9 free-body pose updated from the physics runtime: x=${after.x.toFixed(2)}, y=${after.y.toFixed(2)}.`,
           "good",
         );
         return;
@@ -840,7 +840,7 @@ export default function PhysicalIntelligenceLab() {
           <article><span>02</span><h3>The world model is live</h3><p>Robot and crate poses come from MuJoCo; camera person state comes from on-device MediaPipe inference.</p></article>
           <article><span>03</span><h3>Robotics is layered</h3><p>Mission logic, policy choice, local control, physics and OEM-level actuation remain separate interfaces.</p></article>
           <article><span>04</span><h3>Safety has authority</h3><p>The camera can halt motion locally without waiting for the reasoning layer or mission orchestrator.</p></article>
-          <article><span>05</span><h3>Manipulation is physical</h3><p>PL-9 is a MuJoCo free body. The articulated pusher changes it through collision/contact dynamics.</p></article>
+          <article><span>05</span><h3>Manipulation is physical</h3><p>Under the primary runtime PL-9 is a MuJoCo free body; the articulated pusher moves it through collision/contact dynamics. The UI explicitly reports if the demo-safe 3D fallback is active.</p></article>
           <article><span>06</span><h3>Every mission learns</h3><p>The completed trace becomes an episode: state, decisions, actions, interventions and verified outcome.</p></article>
         </div>
       </section>
