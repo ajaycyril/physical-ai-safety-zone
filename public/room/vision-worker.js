@@ -4,6 +4,10 @@ self.onmessage=async({data:m})=>{
  try{
   if(m.type==='init'){
    const files=await FilesetResolver.forVisionTasks('/vendor/vision/wasm');
+   // The module loader publishes ModuleFactory explicitly. The classic loader
+   // uses a script-scoped var, which is not a worker global after dynamic import.
+   files.wasmLoaderPath='/vendor/vision/wasm/vision_wasm_module_internal.js';
+   files.wasmBinaryPath='/vendor/vision/wasm/vision_wasm_module_internal.wasm';
    detector=await ObjectDetector.createFromOptions(files,{canvas:new OffscreenCanvas(32,32),baseOptions:{modelAssetPath:'/media/efficientdet.tflite',delegate:'CPU'},runningMode:'VIDEO',scoreThreshold:.32,maxResults:10});
    self.postMessage({type:'ready'});
   } else if(m.type==='frame' && detector){
