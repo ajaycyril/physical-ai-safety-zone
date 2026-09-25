@@ -1,139 +1,252 @@
-# Physical AI Safety Zone
+# Physical Intelligence Lab
 
-A working physical-AI demo built around [`roboflow/supervision`](https://github.com/roboflow/supervision).
+A public, working reference implementation for a **Physical Intelligence operating stack**: grounded intent, world state, mission orchestration, policy routing, robot-edge safety, browser physics, live camera perception, and evidence replay.
 
-Live production demo: https://next-project-to-show-physical-ai.vercel.app
+**Live site:** https://next-project-to-show-physical-ai.vercel.app  
+**Live robotics lab:** https://next-project-to-show-physical-ai.vercel.app/lab  
+**World State deep dive:** https://next-project-to-show-physical-ai.vercel.app/world-models.html  
+**Robotics Stack deep dive:** https://next-project-to-show-physical-ai.vercel.app/robotics-stack.html
 
-The repo has two real-time pieces:
+## The thesis
 
-- **Vercel webcam demo**: a Next.js browser app that opens your webcam, lets you draw a polygon zone, and alerts when motion enters the zone.
-- **Supervision edge agent**: a local Python process that runs YOLO + `supervision` on a webcam or video, tracks people, detects entry into a polygon zone, calculates dwell time, and optionally drives a serial device or posts events to the Vercel API.
-
-## Why this demo
-
-This is intentionally a quick physical win: no custom model training, obvious real-world behavior, and a clear path from laptop webcam to hardware output. `supervision` supplies the reusable CV primitives: detections, annotators, tracking, and polygon zones.
-
-## What it demonstrates
-
-The browser demo turns an ordinary webcam into a simple no-go-zone monitor:
-
-1. Open the live Vercel page.
-2. Click **Start webcam** and allow camera access.
-3. Use the sample zone or draw your own polygon by clicking on the live video.
-4. Move your hand or another object inside the zone.
-5. The dashboard changes to `ALERT` when motion is detected inside the zone.
-
-The local `supervision` edge agent runs the model-based version:
-
-1. A camera watches a workcell, counter, aisle, or taped floor area.
-2. YOLO detects people locally.
-3. `supervision` converts model output into `sv.Detections`.
-4. `sv.ByteTrack` assigns persistent IDs.
-5. `sv.PolygonZone` detects whether tracked people are inside a restricted polygon.
-6. The edge agent calculates dwell time and emits `ALERT_ON` or `ALERT_OFF`.
-7. The dashboard visualizes zone state, recent events, and the end-to-end architecture.
-
-This maps cleanly to industrial safety, retail queue monitoring, warehouse restricted areas, robot-cell supervision, and smart-space demos.
-
-## Architecture
+Robot hardware and frontier models will keep changing. The durable product layer is the operating loop that connects human intent to trusted physical state, governed missions, safe execution, and verified outcomes.
 
 ```text
-Browser webcam
-        |
-        v
-Vercel-hosted Next.js dashboard
-  - draw polygon zone
-  - detect motion inside zone
-  - post alert events
+Intent Agent
+    ↓
+Mission Orchestrator
+    ↓
+World State Engine
+    ↓
+Policy Router
+    ↓
+Robot Edge Runtime
+    ↓
+OEM Runtime
+    ↓
+Embodiment
 
-Local camera or video file
-        |
-        v
-Local Python edge agent
-  - Ultralytics YOLO
-  - roboflow/supervision Detections
-  - ByteTrack
-  - PolygonZone
-  - annotators
-        |
-        +--> serial output: LED, buzzer, relay, controller
-        |
-        +--> webhook events: Vercel /api/events
+↕ Data / Learning Plane
+↕ Safety / Trust Plane
 ```
 
-## Run the dashboard
+The live lab implements that loop rather than only diagramming it.
+
+## What is actually running
+
+### 1. Browser robot physics
+
+The primary simulator uses the official Google DeepMind **MuJoCo JavaScript/WebAssembly bindings** with a Three.js renderer.
+
+The MJCF scene contains:
+
+- planar mobile robot R-07,
+- articulated two-joint arm and pusher,
+- Pump P-204,
+- Valve V-12,
+- a controlled operating zone,
+- free-body crate PL-9,
+- staging bay S-3,
+- walls, contacts, friction, gravity, actuators, and local motor control.
+
+Navigation is closed-loop. Robot pose is read back from MuJoCo state. PL-9 is a free body and the manipulation sequence moves it through physical contact.
+
+MuJoCo JS bindings: https://github.com/google-deepmind/mujoco/tree/main/wasm
+
+A deterministic Three.js fallback is intentionally included for demo resilience. The UI explicitly reports which runtime is active; it never labels the fallback as MuJoCo.
+
+### 2. Intent Agent
+
+The operator writes an operational request such as:
+
+> Inspect Pump P-204, verify Valve V-12, recover crate PL-9 to staging bay S-3 if the aisle is clear, and return to dock. Stop locally if the safety camera detects a person.
+
+The browser sends the intent together with the current world snapshot to `/api/agent`.
+
+The mission compiler returns:
+
+- grounded world assessment,
+- tool surface,
+- executable mission steps,
+- selected execution policies,
+- safety requirements,
+- approval boundaries.
+
+The current implementation is deterministic by design so the demo has no model/API-key dependency. The agent interface is intentionally separable from the execution stack so a frontier reasoning model can later sit behind the same tool contract without changing robot control.
+
+### 3. Live World State Engine
+
+The world view fuses state from multiple sources:
+
+| Entity | Live source |
+| --- | --- |
+| R-07 robot pose | MuJoCo body state |
+| PL-9 crate pose | MuJoCo free-body state |
+| P-204 thermal condition | simulated sensor observation |
+| V-12 verification state | mission evidence |
+| CAM-01 person state | MediaPipe browser inference |
+| Mission state | Mission Orchestrator |
+| Safety state | local safety policy |
+
+The interface distinguishes **observed**, **verified**, **planned**, and **authorized** state and renders the current relationships as a semantic scene graph.
+
+### 4. Mission Orchestrator
+
+A compiled intent becomes a stateful mission rather than a direct robot command.
+
+Typical mission:
+
+```text
+world.query
+→ navigate P-204
+→ inspect P-204
+→ navigate V-12
+→ verify V-12
+→ navigate PL-9
+→ manipulate PL-9 → S-3
+→ return DOCK
+→ evidence.commit
+```
+
+The orchestrator owns mission progress, approvals, evidence, and end-to-end traceability.
+
+### 5. Policy Router
+
+Execution is deliberately heterogeneous.
+
+The reference router demonstrates the boundary between:
+
+- deterministic local navigation,
+- vision-language inspection,
+- embodied manipulation policy,
+- OEM low-level control.
+
+The architecture is designed so robotics foundation models can be plugged behind these contracts without coupling the customer workflow to one model vendor.
+
+### 6. Robot Edge Runtime and safety
+
+Safety remains below the reasoning layer.
+
+The edge/runtime boundary demonstrates:
+
+- local motion authority,
+- pause / resume,
+- controlled-zone approval,
+- human-yield behavior,
+- safe stopping independent of the mission planner.
+
+A cloud agent is never treated as an emergency stop.
+
+### 7. Real browser camera stream
+
+The lab can open the user’s webcam with `getUserMedia()`.
+
+MediaPipe Pose Landmarker runs **in the browser** and derives person presence. Raw video is not uploaded by this demo.
+
+MediaPipe Tasks Vision: https://ai.google.dev/edge/mediapipe/solutions/vision/pose_landmarker/web_js
+
+When **Bind to Safety Zone** is enabled, live person presence becomes world state and can pause robot motion locally while a mission is executing.
+
+### 8. Evidence and learning loop
+
+The system trace records:
+
+- grounded state,
+- mission steps,
+- selected policies,
+- robot actions,
+- physics outcomes,
+- safety interventions,
+- approvals,
+- observations and verification events.
+
+At mission completion the trace is treated as a replayable episode for evaluation and future learning.
+
+## Technology stack
+
+- Next.js 16 / React
+- Vercel
+- TypeScript
+- Google DeepMind MuJoCo JS/WASM
+- Three.js
+- MediaPipe Tasks Vision
+- browser `getUserMedia`
+- server-side Next route handlers
+- static high-performance strategy/deep-dive pages
+
+## Run locally
+
+Requirements:
+
+- Node.js 20+
+- a modern Chromium/Safari browser with WebGL
+- HTTPS or localhost for camera access
 
 ```bash
 npm install
 npm run dev
 ```
 
-Open `http://localhost:3000`.
+Open:
 
-## Run the edge agent
-
-Python 3.10+ recommended.
-
-```bash
-cd edge_agent
-python -m venv .venv
-.venv\Scripts\activate
-pip install -r requirements.txt
-python safety_zone_agent.py --source 0 --zone "160,130 500,110 560,400 120,420"
+```text
+http://localhost:3000
+http://localhost:3000/lab
 ```
 
-Draw the zone interactively instead:
+Production build:
 
 ```bash
-python safety_zone_agent.py --source 0 --draw-zone
+npm run build
+npm start
 ```
 
-Post telemetry to a deployed dashboard:
+## Demo sequence
 
-```bash
-python safety_zone_agent.py ^
-  --source 0 ^
-  --zone "160,130 500,110 560,400 120,420" ^
-  --webhook-url "https://YOUR-VERCEL-APP.vercel.app/api/events"
-```
+For the strongest end-to-end walkthrough:
 
-Drive an Arduino/ESP32 over USB serial:
+1. Open the architecture page and explain the layer separation.
+2. Open **Live Lab**.
+3. Confirm the top-left runtime reads `MuJoCo ... live dynamics`.
+4. Click **Start Live Camera** and allow camera access.
+5. Enable **Bind to Safety Zone**.
+6. Compile the default mission.
+7. Dispatch it.
+8. Watch R-07 physically navigate in the 3D scene.
+9. Approve controlled-zone entry.
+10. Approve crate manipulation.
+11. Watch the articulated robot push PL-9 toward S-3.
+12. During motion, step into the webcam view to demonstrate local human-yield safety.
+13. Clear the camera and let the mission continue.
+14. Open the World / Mission / Policy / Learning tabs and show the full trace.
 
-```bash
-python safety_zone_agent.py --source 0 --zone "160,130 500,110 560,400 120,420" --serial-port COM5
-```
+## Architecture principles
 
-The serial protocol is intentionally small:
+- **Intent is not actuation.**
+- **The world model owns trusted state, not imagined truth.**
+- **Mission orchestration owns workflow and evidence.**
+- **Policy selection is pluggable.**
+- **Safety authority lives below reasoning.**
+- **Robot/OEM diversity is hidden behind stable capability contracts.**
+- **Every mission returns evidence and learning data.**
 
-- `ALERT_ON\n` while one or more people are inside the zone.
-- `ALERT_OFF\n` when the zone is clear.
+## Transparency
 
-## Production note
+This is a reference implementation and product thesis, not a claim that every frontier robotics model shown in the architecture is running inside the browser.
 
-The Vercel `/api/events` endpoint is a demo-grade ephemeral event buffer. It is enough to prove edge-to-cloud wiring, but durable production telemetry should use a real store such as Postgres, Redis, or a message queue.
+What is real in the live lab:
 
-## Verification
+- browser physics runtime,
+- 3D robot movement,
+- articulated manipulation,
+- mutable world state,
+- mission compiler,
+- orchestration state machine,
+- policy routing,
+- safety approvals,
+- live camera input,
+- on-device person detection,
+- safety binding,
+- event/evidence trace.
 
-```bash
-npm run verify
-npm run e2e
-```
-
-For the physical loop, run `edge_agent/safety_zone_agent.py` against a webcam or recorded video and confirm:
-
-- webcam/video frames appear in real time,
-- the browser demo alerts when hand/object motion enters the drawn zone,
-- the Python edge agent shows person boxes,
-- tracker IDs stay stable,
-- the polygon zone count changes,
-- dwell seconds increase per tracked person,
-- serial/webhook alerts fire when the zone is occupied.
-
-Latest verified production status:
-
-- Vercel production URL: https://next-project-to-show-physical-ai.vercel.app
-- Production e2e passed
-- `/api/health` returned 200
-- `/api/events` accepted POST and returned the posted event
-- no browser console errors
-- Vercel runtime error log scan was clean
+The goal is to make the interfaces between a production Physical Intelligence stack tangible and executable.
