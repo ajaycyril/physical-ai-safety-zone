@@ -131,6 +131,8 @@ export class MujocoFacilitySim {
   private battery = 96;
   private robotBodyId = -1;
   private crateBodyId = -1;
+  private qposAdr = { x: -1, y: -1, yaw: -1, shoulder: -1, elbow: -1 };
+  private dofAdr = { x: -1, y: -1, yaw: -1, shoulder: -1, elbow: -1 };
   private disposed = false;
 
   constructor(host: HTMLDivElement, onSnapshot: (snapshot: PhysicsSnapshot) => void) {
@@ -158,6 +160,26 @@ export class MujocoFacilitySim {
       this.mujoco.mjtObj.mjOBJ_BODY.value,
       "crate_pl9",
     );
+
+    const jointAddress = (name: string) => {
+      const id = this.mujoco.mj_name2id(
+        this.model,
+        this.mujoco.mjtObj.mjOBJ_JOINT.value,
+        name,
+      );
+      if (id < 0) throw new Error("MuJoCo joint not found: " + name);
+      return {
+        qpos: this.model.jnt_qposadr[id],
+        dof: this.model.jnt_dofadr[id],
+      };
+    };
+    const x = jointAddress("base_x");
+    const y = jointAddress("base_y");
+    const yaw = jointAddress("base_yaw");
+    const shoulder = jointAddress("shoulder");
+    const elbow = jointAddress("elbow");
+    this.qposAdr = { x: x.qpos, y: y.qpos, yaw: yaw.qpos, shoulder: shoulder.qpos, elbow: elbow.qpos };
+    this.dofAdr = { x: x.dof, y: y.dof, yaw: yaw.dof, shoulder: shoulder.dof, elbow: elbow.dof };
 
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color("#08070d");
@@ -274,7 +296,7 @@ export class MujocoFacilitySim {
     );
 
     const geoms = this.mjvScene.geoms;
-    const count = geoms.size();
+    const count = Number(this.mjvScene.ngeom);
     for (let i = 0; i < count; i += 1) {
       const g = geoms.get(i);
       let mesh = this.meshes[i];
@@ -334,11 +356,18 @@ export class MujocoFacilitySim {
       const desiredYaw = Math.atan2(dy, dx);
       const speedScale = this.moveCommand.speedScale;
 
-      ctrl[0] = clamp(dx * 48 * speedScale - qvel[0] * 12, -150, 150);
-      ctrl[1] = clamp(dy * 48 * speedScale - qvel[1] * 12, -150, 150);
-      ctrl[2] = clamp(angleError(desiredYaw, qpos[2]) * 18 - qvel[2] * 5, -60, 60);
+      const vx = qvel[this.dofAdr.x];
+      const vy = qvel[this.dofAdr.y];
+      const wyaw = qvel[this.dofAdr.yaw];
+      ctrl[0] = clamp(dx * 48 * speedScale - vx * 12, -150, 150);
+      ctrl[1] = clamp(dy * 48 * speedScale - vy * 12, -150, 150);
+      ctrl[2] = clamp(
+        angleError(desiredYaw, qpos[this.qposAdr.yaw]) * 18 - wyaw * 5,
+        -60,
+        60,
+      );
 
-      if (dist < 0.13 && Math.hypot(qvel[0], qvel[1]) < 0.35) {
+      if (dist < 0.13 && Math.hypot(vx, vy) < 0.35) {
         ctrl[0] = 0;
         ctrl[1] = 0;
         ctrl[2] = 0;
@@ -347,15 +376,23 @@ export class MujocoFacilitySim {
         done.resolve();
       }
     } else {
-      ctrl[0] = clamp(-qvel[0] * 10, -50, 50);
-      ctrl[1] = clamp(-qvel[1] * 10, -50, 50);
-      ctrl[2] = clamp(-qvel[2] * 5, -30, 30);
+      ctrl[0] = clamp(-qvel[this.dofAdr.x] * 10, -50, 50);
+      ctrl[1] = clamp(-qvel[this.dofAdr.y] * 10, -50, 50);
+      ctrl[2] = clamp(-qvel[this.dofAdr.yaw] * 5, -30, 30);
     }
 
-    const shoulder = qpos[3];
-    const elbow = qpos[4];
-    ctrl[3] = clamp((this.armTarget.shoulder - shoulder) * 34 - qvel[3] * 5, -50, 50);
-    ctrl[4] = clamp((this.armTarget.elbow - elbow) * 30 - qvel[4] * 4, -42, 42);
+    const shoulder = qpos[this.qposAdr.shoulder];
+    const elbow = qpos[this.qposAdr.elbow];
+    ctrl[3] = clamp(
+      (this.armTarget.shoulder - shoulder) * 34 - qvel[this.dofAdr.shoulder] * 5,
+      -50,
+      50,
+    );
+    ctrl[4] = clamp(
+      (this.armTarget.elbow - elbow) * 30 - qvel[this.dofAdr.elbow] * 4,
+      -42,
+      42,
+    );
   }
 
   private robotPosition() {
@@ -378,7 +415,7 @@ export class MujocoFacilitySim {
     const qpos = this.data.qpos as Float64Array;
     this.onSnapshot({
       time: this.data.time,
-      robot: { ...r, yaw: qpos[2], battery: this.battery },
+      robot: { ...r, yaw: qpos[this.qposAdr.yaw], battery: this.battery },
       crate: c,
       contacts: this.data.ncon ?? 0,
       paused: this.paused,
@@ -442,7 +479,7 @@ export class MujocoFacilitySim {
     const qpos = this.data.qpos as Float64Array;
     return {
       time: this.data.time,
-      robot: { ...r, yaw: qpos[2], battery: this.battery },
+      robot: { ...r, yaw: qpos[this.qposAdr.yaw], battery: this.battery },
       crate: c,
       contacts: this.data.ncon ?? 0,
       paused: this.paused,
