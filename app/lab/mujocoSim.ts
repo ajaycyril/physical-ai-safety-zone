@@ -482,3 +482,192 @@ export class MujocoFacilitySim {
     this.model?.delete?.();
   }
 }
+
+
+export class FallbackFacilitySim {
+  private host: HTMLDivElement;
+  private onSnapshot: (snapshot: PhysicsSnapshot) => void;
+  private scene = new THREE.Scene();
+  private renderer: THREE.WebGLRenderer;
+  private camera: THREE.PerspectiveCamera;
+  private controls: OrbitControls;
+  private robot = new THREE.Group();
+  private arm1 = new THREE.Group();
+  private arm2 = new THREE.Group();
+  private crate: THREE.Mesh;
+  private raf: number | null = null;
+  private resizeObserver: ResizeObserver;
+  private paused = false;
+  private battery = 96;
+  private move: { x:number; y:number; resolve:()=>void; speed:number } | null = null;
+  private last = performance.now();
+  private disposed = false;
+
+  constructor(host: HTMLDivElement, onSnapshot: (snapshot: PhysicsSnapshot) => void) {
+    this.host = host;
+    this.onSnapshot = onSnapshot;
+    this.renderer = new THREE.WebGLRenderer({ antialias:true });
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.7));
+    this.renderer.shadowMap.enabled = true;
+    this.host.replaceChildren(this.renderer.domElement);
+    this.camera = new THREE.PerspectiveCamera(43,1,.05,80);
+    this.camera.up.set(0,0,1);
+    this.camera.position.set(-7.8,-8.4,7);
+    this.controls = new OrbitControls(this.camera,this.renderer.domElement);
+    this.controls.target.set(0,0,.35);
+    this.controls.enableDamping = true;
+
+    this.scene.background = new THREE.Color("#08070d");
+    this.scene.fog = new THREE.FogExp2("#08070d",.035);
+    this.scene.add(new THREE.HemisphereLight(0xc7c2ff,0x09080d,1.3));
+    const key = new THREE.DirectionalLight(0xffffff,1.8);
+    key.position.set(-5,-4,8); key.castShadow = true; this.scene.add(key);
+    const rim = new THREE.PointLight(0xf2a8d8,18,12,2); rim.position.set(3,1,3.2); this.scene.add(rim);
+
+    const floor = new THREE.Mesh(
+      new THREE.BoxGeometry(11.2,9.4,.08),
+      new THREE.MeshStandardMaterial({color:0x0e0c16,roughness:.9})
+    );
+    floor.position.z=-.04; floor.receiveShadow=true; this.scene.add(floor);
+
+    const wallMat = new THREE.MeshStandardMaterial({color:0x24202f,roughness:.85});
+    const wall = (x:number,y:number,sx:number,sy:number) => {
+      const m=new THREE.Mesh(new THREE.BoxGeometry(sx,sy,.9),wallMat);
+      m.position.set(x,y,.45);m.castShadow=true;this.scene.add(m);
+    };
+    wall(0,4.7,11.2,.16);wall(0,-4.7,11.2,.16);wall(5.5,0,.16,9.4);wall(-5.5,0,.16,9.4);
+
+    const zone = new THREE.Mesh(
+      new THREE.BoxGeometry(4,2.9,.025),
+      new THREE.MeshStandardMaterial({color:0x6c4a1f,transparent:true,opacity:.22})
+    );
+    zone.position.set(2.9,1.65,.015);this.scene.add(zone);
+
+    const pump = new THREE.Mesh(
+      new THREE.CylinderGeometry(.34,.34,.8,28),
+      new THREE.MeshStandardMaterial({color:0xbf405e,roughness:.6})
+    );
+    pump.rotation.x=Math.PI/2;pump.position.set(2.4,1.55,.4);this.scene.add(pump);
+    const valve = new THREE.Mesh(
+      new THREE.CylinderGeometry(.18,.18,.9,24),
+      new THREE.MeshStandardMaterial({color:0x6b79ad,roughness:.55})
+    );
+    valve.rotation.x=Math.PI/2;valve.position.set(3.55,.45,.45);this.scene.add(valve);
+
+    const stage = new THREE.Mesh(
+      new THREE.BoxGeometry(1.56,1.44,.14),
+      new THREE.MeshStandardMaterial({color:0x2e856e,transparent:true,opacity:.55})
+    );
+    stage.position.set(3.65,-2.3,.07);this.scene.add(stage);
+
+    this.crate = new THREE.Mesh(
+      new THREE.BoxGeometry(.68,.68,.44),
+      new THREE.MeshStandardMaterial({color:0x96612e,roughness:.8})
+    );
+    this.crate.position.set(.95,-2.25,.22);this.crate.castShadow=true;this.scene.add(this.crate);
+
+    const base = new THREE.Mesh(
+      new THREE.BoxGeometry(.96,.68,.36),
+      new THREE.MeshStandardMaterial({color:0x574ab2,roughness:.45,metalness:.12})
+    );
+    base.castShadow=true;this.robot.add(base);
+    const mast = new THREE.Mesh(
+      new THREE.CylinderGeometry(.08,.08,.5,18),
+      new THREE.MeshStandardMaterial({color:0xb4a8f8})
+    );
+    mast.rotation.x=Math.PI/2;mast.position.set(.24,0,.32);this.robot.add(mast);
+    const head = new THREE.Mesh(
+      new THREE.SphereGeometry(.09,18,12),
+      new THREE.MeshStandardMaterial({color:0xf2a8d8,emissive:0x4d223b,emissiveIntensity:.5})
+    );
+    head.position.set(.24,0,.62);this.robot.add(head);
+
+    const armOneMesh = new THREE.Mesh(
+      new THREE.CapsuleGeometry(.075,.57,8,14),
+      new THREE.MeshStandardMaterial({color:0x9387e8})
+    );
+    armOneMesh.rotation.z=-Math.PI/2;armOneMesh.position.x=.36;this.arm1.add(armOneMesh);
+    this.arm1.position.set(.05,0,.35);this.robot.add(this.arm1);
+    const armTwoMesh = new THREE.Mesh(
+      new THREE.CapsuleGeometry(.065,.49,8,14),
+      new THREE.MeshStandardMaterial({color:0xb6adf5})
+    );
+    armTwoMesh.rotation.z=-Math.PI/2;armTwoMesh.position.x=.31;this.arm2.add(armTwoMesh);
+    this.arm2.position.x=.72;this.arm1.add(this.arm2);
+    const pusher = new THREE.Mesh(
+      new THREE.BoxGeometry(.16,.44,.3),
+      new THREE.MeshStandardMaterial({color:0xf0a3d0})
+    );
+    pusher.position.x=.68;this.arm2.add(pusher);
+
+    this.robot.position.set(-3.5,-2.55,.28);this.scene.add(this.robot);
+    this.resizeObserver = new ResizeObserver(()=>this.resize());
+  }
+
+  async init() {
+    this.resizeObserver.observe(this.host);
+    this.resize();
+    this.setArm(-.18,.48);
+    this.run();
+  }
+
+  private resize(){
+    const w=Math.max(1,this.host.clientWidth),h=Math.max(1,this.host.clientHeight);
+    this.renderer.setSize(w,h,false);this.camera.aspect=w/h;this.camera.updateProjectionMatrix();
+  }
+
+  private run(){
+    const loop=(now:number)=>{
+      if(this.disposed)return;
+      const dt=Math.min(.04,(now-this.last)/1000);this.last=now;
+      if(!this.paused&&this.move){
+        const dx=this.move.x-this.robot.position.x,dy=this.move.y-this.robot.position.y;
+        const dist=Math.hypot(dx,dy);
+        if(dist<.06){
+          const done=this.move;this.move=null;done.resolve();
+        }else{
+          const step=Math.min(dist,dt*1.3*this.move.speed);
+          this.robot.rotation.z=Math.atan2(dy,dx);
+          const oldX=this.robot.position.x,oldY=this.robot.position.y;
+          this.robot.position.x+=dx/dist*step;this.robot.position.y+=dy/dist*step;
+          this.battery=Math.max(18,this.battery-step*.02);
+          const crateDist=Math.hypot(this.crate.position.x-this.robot.position.x,this.crate.position.y-this.robot.position.y);
+          if(crateDist<1.25&&this.arm1.rotation.y>-0.18){
+            const mx=this.robot.position.x-oldX,my=this.robot.position.y-oldY;
+            this.crate.position.x+=mx*.9;this.crate.position.y+=my*.9;
+          }
+        }
+      }
+      this.controls.update();this.renderer.render(this.scene,this.camera);
+      this.onSnapshot(this.getSnapshot());this.raf=requestAnimationFrame(loop);
+    };
+    this.raf=requestAnimationFrame(loop);
+  }
+
+  moveTo(x:number,y:number,speedScale=1){
+    return new Promise<void>((resolve)=>{this.move={x,y,resolve,speed:speedScale};});
+  }
+  setArm(shoulder:number,elbow:number){
+    this.arm1.rotation.y=shoulder;this.arm2.rotation.y=elbow;
+  }
+  async setArmAndWait(shoulder:number,elbow:number,ms=600){
+    this.setArm(shoulder,elbow);await new Promise(r=>setTimeout(r,ms));
+  }
+  setPaused(value:boolean){this.paused=value;}
+  isPaused(){return this.paused;}
+  getSnapshot():PhysicsSnapshot{
+    return {
+      time:performance.now()/1000,
+      robot:{x:this.robot.position.x,y:this.robot.position.y,z:this.robot.position.z,yaw:this.robot.rotation.z,battery:this.battery},
+      crate:{x:this.crate.position.x,y:this.crate.position.y,z:this.crate.position.z},
+      contacts:Math.hypot(this.crate.position.x-this.robot.position.x,this.crate.position.y-this.robot.position.y)<1.2?1:0,
+      paused:this.paused,
+    };
+  }
+  reset(){
+    this.move=null;this.robot.position.set(-3.5,-2.55,.28);this.robot.rotation.z=0;this.crate.position.set(.95,-2.25,.22);this.battery=96;this.paused=false;this.setArm(-.18,.48);
+  }
+  dispose(){
+    this.disposed=true;if(this.raf)cancelAnimationFrame(this.raf);this.resizeObserver.disconnect();this.controls.dispose();this.renderer.dispose();
+  }
+}
