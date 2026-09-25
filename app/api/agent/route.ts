@@ -107,3 +107,14 @@ export async function POST(req: NextRequest) {
     generatedAt: new Date().toISOString(),
   });
 }
+
+
+export async function GET() {
+  return NextResponse.json({
+    status: "ready",
+    service: "Intent Agent / Mission Compiler",
+    tools: ["world.query", "policy.check", "mission.compile", "robot.dispatch", "evidence.commit"],
+    safety: ["camera-human-yield", "controlled-zone-approval", "local-stop-authority"],
+    physics: "MuJoCo WASM primary / explicit Three.js fallback",
+  });
+}
