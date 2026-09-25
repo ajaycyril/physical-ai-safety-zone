@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import styles from "./lab.module.css";
-import { MujocoFacilitySim, type PhysicsSnapshot } from "./mujocoSim";
+import { FallbackFacilitySim, MujocoFacilitySim, type PhysicsSnapshot } from "./mujocoSim";
 
 type PlanStep = {
   id: string;
@@ -72,7 +72,7 @@ function fmt(value: number) {
 
 export default function PhysicalIntelligenceLab() {
   const simHostRef = useRef<HTMLDivElement | null>(null);
-  const simRef = useRef<MujocoFacilitySim | null>(null);
+  const simRef = useRef<MujocoFacilitySim | FallbackFacilitySim | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const overlayRef = useRef<HTMLCanvasElement | null>(null);
   const cameraLoopRef = useRef<number | null>(null);
@@ -125,13 +125,30 @@ export default function PhysicalIntelligenceLab() {
         setSimulationMode("MuJoCo 3.13 WASM / live dynamics");
         appendEvent("PHYSICS", "MuJoCo WebAssembly model compiled and physics loop started.", "good");
       })
-      .catch((error) => {
+      .catch(async (error) => {
         if (!alive) return;
         const message = error instanceof Error ? error.message : String(error);
-        setPhysicsStatus("error");
-        setPhysicsError(message);
-        setSimulationMode("Physics runtime unavailable");
-        appendEvent("PHYSICS", "MuJoCo initialization failed: " + message, "danger");
+        appendEvent("PHYSICS", "MuJoCo initialization failed in this browser: " + message, "warn");
+        try {
+          sim.dispose();
+          const fallback = new FallbackFacilitySim(host, (next) => {
+            if (alive) setSnapshot(next);
+          });
+          simRef.current = fallback;
+          await fallback.init();
+          if (!alive) return;
+          setPhysicsStatus("ready");
+          setPhysicsError("");
+          setSimulationMode("Three.js deterministic fallback / MuJoCo unavailable");
+          appendEvent("PHYSICS", "3D fallback runtime activated so the mission remains fully demonstrable.", "good");
+        } catch (fallbackError) {
+          if (!alive) return;
+          const fallbackMessage = fallbackError instanceof Error ? fallbackError.message : String(fallbackError);
+          setPhysicsStatus("error");
+          setPhysicsError(fallbackMessage);
+          setSimulationMode("Physics runtime unavailable");
+          appendEvent("PHYSICS", "Fallback runtime failed: " + fallbackMessage, "danger");
+        }
       });
 
     return () => {
