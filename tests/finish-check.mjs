@@ -17,10 +17,15 @@ async function layout(city){
  await page.setViewportSize({width:390,height:844});await page.waitForTimeout(500);assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2),'Mobile width '+city);await shot((city?'city':'factory')+'-finished-mobile');await page.setViewportSize({width:1440,height:900});
 }
 async function mission(city,text,{approval=true,label}={}){
- await page.locator(city?'#cityIntent':'#intent').fill(text);const started=Date.now();await page.locator(city?'#runCity':'#runBtn').click();let approved=false,done=false;const phases=new Set();let shotTaken=false;
- while(Date.now()-started<294000){const s=await state(city);phases.add(s.phase);if(await page.locator('#approval').isVisible()){assert(approval,'Read-only mission never asks for actuator approval');if(!approved){await shot(label+'-approval');await page.locator(city?'#approveCity':'#approveBtn').click();approved=true;}}
+ const oldId=(await state(city)).plan?.id||null;
+ await page.locator(city?'#cityIntent':'#intent').fill(text);const started=Date.now();await page.locator(city?'#runCity':'#runBtn').click();
+ // Terminal-state redispatch deliberately resets asynchronously. Do not mistake the
+ // previous mission's COMPLETE state for completion of this new operator command.
+ await page.waitForFunction(({city,oldId})=>{const s=city?window.__city.state():window.__room.state();return !['COMPLETE','READY','IDLE','STARTING','STOPPED','BLOCKED'].includes(s.status)&&(!oldId||s.plan?.id!==oldId);},{city,oldId},{timeout:30000});
+ let approved=false,done=false;const phases=new Set();let shotTaken=false;
+ while(Date.now()-started<294000){const s=await state(city);phases.add(s.phase);if(await page.locator('#approval').isVisible()){assert(approval,'Requested workflow permits an approval gate');if(!approved){await shot(label+'-approval');await page.locator(city?'#approveCity':'#approveBtn').click();approved=true;}}
   if(s.phase===6&&!shotTaken){await shot(label+'-acting');shotTaken=true;}
-  if(s.status==='COMPLETE'){done=true;break;}if(['STOPPED','BLOCKED','ERROR','FAILED'].includes(s.status))throw Error(label+' failed: '+JSON.stringify(s.events.slice(-4)));await page.waitForTimeout(600);
+  if(s.status==='COMPLETE'&&s.plan?.id!==oldId){done=true;break;}if(['STOPPED','BLOCKED','ERROR','FAILED'].includes(s.status))throw Error(label+' failed: '+JSON.stringify(s.events.slice(-4)));await page.waitForTimeout(600);
  }
  const s=await state(city);report.missions.push({label,seconds:(Date.now()-started)/1000,done,approved,plan:s.plan,physics:s.physics,scene:s.scene,result:s.result,events:s.events.map(e=>({layer:e.layer,text:e.text,detail:e.detail})),site:await page.evaluate(()=>window.__siteDetail.entities())});assert(done,label+' completed under five minutes');assert(approved===approval,label+' follows requested authority');
  if(!city){assert(s.runtime==='MuJoCo','Original MuJoCo runtime preserved');assert(s.physics.valve>1.45,'Measured valve closure');assert(s.physics.process.flow>45,'Measured standby flow recovery');assert(s.physics.process.standbyRPM>.9,'Measured standby motor state');assert((await page.evaluate(()=>window.__siteDetail.entities().find(e=>e.id==='LINE-A').status))==='Producing','Cooling recovery releases modeled assembly dependency');}
