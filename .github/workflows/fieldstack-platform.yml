@@ -1,0 +1,65 @@
+name: Fieldstack platform acceptance
+on:
+  workflow_dispatch:
+  push:
+    branches: [fieldstack-platform-v5]
+permissions:
+  contents: read
+concurrency:
+  group: fieldstack-platform-v5
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Prepare inspection dependencies
+        run: |
+          npm install --no-save @electric-sql/pglite@0.3.14 graphology@0.26.0 xstate@5.20.2 esbuild@0.25.5 roslib@1.4.1
+          mkdir -p /tmp/platform-deps
+          ./node_modules/.bin/esbuild node_modules/graphology/dist/graphology.esm.js --bundle --format=esm --platform=browser --outfile=/tmp/platform-deps/graphology.js
+          ./node_modules/.bin/esbuild node_modules/xstate/dist/xstate.esm.js --bundle --format=esm --platform=browser --outfile=/tmp/platform-deps/xstate.js
+          cp -r node_modules/@electric-sql/pglite/dist /tmp/platform-deps/pglite
+          cp node_modules/roslib/build/roslib.min.js /tmp/platform-deps/roslib.js
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fieldstack-source
+          retention-days: 7
+          path: |
+            public/room/
+            scripts/
+            tests/
+            app/
+            lib/
+            public/city.html
+            public/studio.html
+            next.config.ts
+            tsconfig.json
+            package.json
+            .gitignore
+            vercel.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fieldstack-deps
+          retention-days: 7
+          path: /tmp/platform-deps/
+      - name: Verify platform
+        if: ${{ hashFiles('tests/platform-check.mjs') != '' }}
+        run: |
+          npm run build
+          npx playwright install --with-deps chromium
+          npm start > /tmp/platform-app.log 2>&1 &
+          for i in $(seq 1 80); do curl -sf http://localhost:3000/api/health >/dev/null && break || sleep 2; done
+          node tests/platform-check.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fieldstack-verification
+          retention-days: 7
+          path: |
+            test-report/
+            /tmp/platform-app.log
