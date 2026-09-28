@@ -1,0 +1,3 @@
+import {compileGoal,examples,COMMAND_VERSION} from '../../public-command-bridge';
+export async function GET(){return Response.json({version:COMMAND_VERSION,mode:'bounded deterministic compiler',examples,notice:'Editable mission goals, not arbitrary learned robot actions.'});}
+export async function POST(req:Request){try{const text=await req.text();if(text.length>2048)return Response.json({ok:false,error:'Request too large'},{status:413});const b=JSON.parse(text);const plan=compileGoal(b.intent,b.environment);return Response.json(plan,{status:plan.ok?200:plan.code});}catch{return Response.json({ok:false,error:'Invalid goal request'},{status:400});}}

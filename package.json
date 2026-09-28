@@ -1,19 +1,12 @@
 {
-  "name": "physical-intelligence-lab",
-  "version": "0.5.1",
-  "private": true,
-  "type": "module",
-  "description": "Physical Intelligence control room with real video inference and live Abu Dhabi context.",
-  "scripts": {
-    "dev": "node scripts/prepare-studio.mjs && node scripts/prepare-city.mjs && node scripts/prepare-portal.mjs && node scripts/prepare-unified.mjs && node scripts/prepare-abu-dhabi.mjs && next dev",
-    "build": "node scripts/prepare-studio.mjs && node scripts/prepare-city.mjs && node scripts/prepare-portal.mjs && node scripts/prepare-unified.mjs && node scripts/prepare-abu-dhabi.mjs && node --check public/room/studio.js && node --check public/room/city-studio.js && node --check public/room/city-scene.js && node --check public/room/city-vision.js && node --check public/room/abu-dhabi.js && next build",
-    "start": "next start",
-    "typecheck": "tsc --noEmit",
-    "test": "node --test tests/*.test.mjs",
-    "e2e": "node tests/unified-check.mjs",
-    "verify": "npm run typecheck && npm test && npm run build"
-  },
-  "dependencies": {"next":"latest","react":"latest","react-dom":"latest","@mujoco/mujoco":"3.13.0","@mediapipe/tasks-vision":"1.0.1","three":"0.186.0"},
-  "overrides": {"postcss":"^8.5.10"},
-  "devDependencies": {"@types/node":"latest","@types/react":"latest","@types/react-dom":"latest","playwright":"^1.60.0","typescript":"latest","@types/three":"0.186.0"}
+ "name":"physical-intelligence-lab","version":"0.6.0","private":true,"type":"module",
+ "description":"Physical Intelligence control room with real video inference, live Abu Dhabi context and validated editable mission goals.",
+ "scripts":{
+  "dev":"node scripts/prepare-studio.mjs && node scripts/prepare-city.mjs && node scripts/prepare-portal.mjs && node scripts/prepare-unified.mjs && node scripts/prepare-abu-dhabi.mjs && node scripts/prepare-finish.mjs && next dev",
+  "build":"node scripts/prepare-studio.mjs && node scripts/prepare-city.mjs && node scripts/prepare-portal.mjs && node scripts/prepare-unified.mjs && node scripts/prepare-abu-dhabi.mjs && node scripts/prepare-finish.mjs && node --check public/room/studio.js && node --check public/room/city-studio.js && node --check public/room/city-scene.js && node --check public/room/city-vision.js && node --check public/room/abu-dhabi.js && next build",
+  "start":"next start","typecheck":"tsc --noEmit","test":"node --test tests/*.test.mjs","e2e":"node tests/unified-check.mjs","verify":"npm run typecheck && npm test && npm run build"
+ },
+ "dependencies":{"next":"latest","react":"latest","react-dom":"latest","@mujoco/mujoco":"3.13.0","@mediapipe/tasks-vision":"1.0.1","three":"0.186.0"},
+ "overrides":{"postcss":"^8.5.10"},
+ "devDependencies":{"@types/node":"latest","@types/react":"latest","@types/react-dom":"latest","playwright":"^1.60.0","typescript":"latest","@types/three":"0.186.0"}
 }
