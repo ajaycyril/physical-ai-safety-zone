@@ -1,0 +1,6 @@
+import fs from 'node:fs/promises';
+// This enhancement runs last. No additional runtime package, map SDK or model download.
+for(const name of ['city','studio']){const p='public/'+name+'.html';let h=await fs.readFile(p,'utf8');if(!h.includes('/room/abu-dhabi.css'))h=h.replace('</head>','<link rel="stylesheet" href="/room/abu-dhabi.css"></head>');h=h.replace('import "/room/unified.js";await import(', 'import "/room/unified.js";import "/room/abu-dhabi.js";await import(');await fs.writeFile(p,h);}
+const p='public/room/unified.js';let s=await fs.readFile(p,'utf8');if(!s.includes('openPopup,closePopup,pick,state:'))s=s.replace('window.__console={state:','window.__console={openPopup,closePopup,pick,state:');if(!s.includes('window.__abuDhabi?.entity()'))s=s.replace('return all;};','const wx=window.__abuDhabi?.entity();if(wx)all.push(wx);return all;};');await fs.writeFile(p,s);
+for(const f of ['city-studio.js','studio.js']){const path='public/room/'+f;let code=await fs.readFile(path,'utf8');const line="window.addEventListener('context:event',e=>event(e.detail.layer,e.detail.text,e.detail.detail));";if(!code.includes(line))code+='\n'+line+'\n';await fs.writeFile(path,code);}
+console.log('Abu Dhabi live context enabled: cached JSON + existing renderer/inspector.');
