@@ -6,6 +6,7 @@ for(const entry of ['city','studio']){
  if(!html.includes('/room/finish.css'))html=html.replace('</head>','<link rel="stylesheet" href="/room/finish.css"></head>');
  if(!html.includes('/room/finish-layout.css'))html=html.replace('</head>','<link rel="stylesheet" href="/room/finish-layout.css"></head>');
  if(!html.includes('/room/site-detail.js'))html=html.replace('await import(', 'import "/room/site-detail.js";import "/room/command-ui.js";await import(');
+ if(!html.includes('/room/render-budget.js'))html=html.replace('await import(', 'import "/room/render-budget.js";await import(');
  html=html.replace('<title>Physical Intelligence · Cognitive City</title>','<title>Fieldstack · Cognitive City</title>').replace('<title>Physical Intelligence / Ajay Cyril</title>','<title>Fieldstack · Factory</title>');
  await fs.writeFile(path,html);
 }
@@ -28,5 +29,5 @@ if(!city.includes('async function currentEvidence(')){
  city+="\nasync function currentEvidence(signal){return waitForEvidence(()=>vision.all(),{signal,onWait:()=>{scene.hold('dispatch-evidence',true);$('decisionDetail').textContent='Waiting for current frames from both cameras';event('PERCEPTION','Waiting for current camera evidence; freshness limits unchanged.');},onRelease:()=>scene.hold('dispatch-evidence',false)});}\n";
  await fs.writeFile(cityPath,city);
 }
-for(const p of ['site-detail.js','command-ui.js','command-contract.mjs','evidence-gate.mjs'])execFileSync(process.execPath,['--check','public/room/'+p],{stdio:'inherit'});
-console.log('Fieldstack finish: intricate site scenes, shared goal validation, bounded fresh-evidence gate.');
+for(const p of ['site-detail.js','render-budget.js','command-ui.js','command-contract.mjs','evidence-gate.mjs'])execFileSync(process.execPath,['--check','public/room/'+p],{stdio:'inherit'});
+console.log('Fieldstack finish: instanced site scenes, shared goal validation, bounded fresh-evidence gate.');
