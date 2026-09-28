@@ -30,22 +30,28 @@ jobs:
             next.config.ts
             tsconfig.json
       - uses: actions/setup-node@v4
-        if: ${{ hashFiles('tests/finish-check.mjs') != '' }}
         with:
           node-version: '22'
       - name: Install and build
-        if: ${{ hashFiles('tests/finish-check.mjs') != '' }}
         run: |
           npm install
           npm test
           npm run build
           npx playwright install --with-deps chromium
-      - name: Exercise complete workflows
-        if: ${{ hashFiles('tests/finish-check.mjs') != '' }}
+      - name: Start production server
         run: |
           npm start > /tmp/finish-app.log 2>&1 &
           for i in $(seq 1 60); do curl -sf http://localhost:3000/api/health >/dev/null && break || sleep 2; done
-          node tests/finish-check.mjs
+      - name: Verify command and scene geometry
+        run: node tests/finish-presentation.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: finish-presentation
+          retention-days: 7
+          path: test-report/
+      - name: Exercise complete workflows
+        run: node tests/finish-check.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:

@@ -1,0 +1,24 @@
+/* Fixed tracks prevent inherited flex:1 from pushing command tools into the scene. */
+.fieldstack-finished .fs-command{height:78px;display:grid;grid-template-rows:53px 20px;gap:5px;padding:0;align-content:center}
+.fieldstack-finished .fs-command form{flex:none!important;height:53px!important;min-height:0!important;max-height:53px!important;box-sizing:border-box;margin:0}
+.fieldstack-finished .fs-command form button{min-height:0;line-height:1.25}
+.fieldstack-finished .fs-command .fs-goal-preview{height:20px;min-height:20px;line-height:20px;padding-top:0;padding-bottom:0;overflow:hidden}
+.fieldstack-finished .fs-goal-tools{bottom:0;height:20px;align-items:center}
+.fieldstack-finished .fs-goal-tools button,.fieldstack-finished .fs-goal-tools button:hover:not(:disabled){background:transparent;transform:none;color:#d1bff0;line-height:20px;border:0;box-shadow:none}
+.fieldstack-finished .fs-goal-tools button:hover:not(:disabled){color:#f4eaff;text-decoration:underline;text-underline-offset:3px}
+@media(max-height:790px) and (min-width:1050px){
+ .fieldstack-finished .fs-command{height:64px;grid-template-rows:44px 17px;gap:3px}
+ .fieldstack-finished .fs-command form{height:44px!important;max-height:44px!important;padding:4px}
+ .fieldstack-finished .fs-command form button{padding:6px 12px;min-height:0}
+ .fieldstack-finished .fs-command form button span,.fieldstack-finished .fs-command form button b{font-size:16px;line-height:20px}
+ .fieldstack-finished .fs-command .fs-goal-preview{height:17px;min-height:17px;line-height:17px}
+ .fieldstack-finished .fs-goal-tools,.fieldstack-finished .fs-goal-tools button{height:17px;line-height:17px}
+}
+@media(max-width:1049px){.fieldstack-finished .fs-command{align-self:stretch;height:78px;min-height:78px}.fieldstack-finished .fs-command form{flex-wrap:nowrap}.fieldstack-finished .fs-command form input{flex-basis:auto}.fieldstack-finished .fs-command form button{width:auto}}
+@media(max-width:650px){
+ .fieldstack-finished .fs-command{height:124px;min-height:124px;grid-template-rows:99px 20px;gap:5px}
+ .fieldstack-finished .fs-command form{height:99px!important;max-height:99px!important;display:grid;grid-template-rows:42px 42px;grid-template-columns:1fr;padding:4px;gap:5px}
+ .fieldstack-finished .fs-command form input{width:100%;min-height:0;padding:8px;font-size:12px}
+ .fieldstack-finished .fs-command form button{width:100%;min-width:0;display:flex;align-items:center;justify-content:space-between;padding:8px 12px}
+ .fieldstack-finished .fs-command .fs-goal-preview{padding-left:4px;padding-right:125px;font-size:10px}
+}

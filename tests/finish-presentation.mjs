@@ -1,0 +1,12 @@
+import{chromium}from'playwright';import fs from'node:fs/promises';
+const dir='test-report',base=process.env.BASE_URL||'http://127.0.0.1:3000';await fs.mkdir(dir,{recursive:true});
+const report={checks:[],errors:[],screens:[]},browser=await chromium.launch({headless:true,args:['--no-sandbox','--enable-unsafe-swiftshader','--use-angle=swiftshader','--disable-dev-shm-usage']}),page=await browser.newPage({viewport:{width:1366,height:768},deviceScaleFactor:1});page.on('pageerror',e=>report.errors.push(String(e)));const assert=(v,name)=>{report.checks.push({name,pass:!!v});if(!v)throw Error(name);};
+try{for(const city of[false,true]){
+ await page.goto(base+(city?'/city.html':'/studio.html'),{waitUntil:'domcontentloaded'});await page.waitForFunction(()=>window.__siteDetail?.info().instances>400,null,{timeout:60000});
+ for(const[w,h]of[[1366,768],[1440,900],[1728,895],[390,844]]){
+ await page.setViewportSize({width:w,height:h});await page.waitForTimeout(800);const g=await page.evaluate(()=>{const r=q=>document.querySelector(q).getBoundingClientRect(),p=r('#goalPreview'),b=r('#goalExamples'),f=r('.fs-command form'),scene=r('.workspace');return{preview:p.toJSON(),button:b.toJSON(),form:f.toJSON(),scene:scene.toJSON(),x:document.documentElement.scrollWidth-innerWidth};});
+ assert(g.x<=2,'Width '+city+' '+w);assert(g.preview.bottom<=g.scene.top-2,'Preview never crosses scene '+city+' '+w);assert(g.button.bottom<=g.scene.top-2,'Examples stay above scene '+city+' '+w);assert(g.form.bottom<=g.preview.top+1,'Input never overlaps interpretation '+city+' '+w);
+ const path=dir+'/'+(city?'city':'factory')+'-final-view-'+w+'.png';await page.screenshot({path,fullPage:w<600});report.screens.push(path);
+ }
+ await page.setViewportSize({width:1366,height:768});await page.locator('#goalExamples').click();assert(await page.locator('.fs-examples button').count()===3,'Compact examples '+city);await page.screenshot({path:dir+'/'+(city?'city':'factory')+'-final-examples.png'});await page.locator('[data-close]').click();
+}assert(report.errors.length===0,'No browser errors');report.pass=true;}catch(e){report.pass=false;report.failure=String(e);await page.screenshot({path:dir+'/presentation-failure.png'});process.exitCode=1;}finally{await fs.writeFile(dir+'/finish-presentation.json',JSON.stringify(report,null,2));await browser.close();console.log(JSON.stringify(report));}
