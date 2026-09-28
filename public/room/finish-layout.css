@@ -1,6 +1,6 @@
 /* Fixed tracks prevent inherited flex:1 from pushing command tools into the scene. */
-.fieldstack-finished .fs-command{height:78px;display:grid;grid-template-rows:53px 20px;gap:5px;padding:0;align-content:center}
-.fieldstack-finished .fs-command form{flex:none!important;height:53px!important;min-height:0!important;max-height:53px!important;box-sizing:border-box;margin:0}
+.fieldstack-finished .fs-command{height:78px;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:53px 20px;justify-content:stretch;justify-items:stretch;gap:5px;padding:0;align-content:center}
+.fieldstack-finished .fs-command form{flex:none!important;width:100%!important;max-width:none!important;height:53px!important;min-height:0!important;max-height:53px!important;box-sizing:border-box;margin:0}
 .fieldstack-finished .fs-command form button{min-height:0;line-height:1.25}
 .fieldstack-finished .fs-command .fs-goal-preview{height:20px;min-height:20px;line-height:20px;padding-top:0;padding-bottom:0;overflow:hidden}
 .fieldstack-finished .fs-goal-tools{bottom:0;height:20px;align-items:center}
