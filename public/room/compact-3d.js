@@ -8,7 +8,7 @@ const ready=setInterval(()=>{
  if(headline)headline.innerHTML=city?'Abu Dhabi <em>district operations.</em>':'Industrial <em>robot operations.</em>';
  const switcher=document.createElement('nav');switcher.className='compact-context';switcher.setAttribute('aria-label','Demo environments');
  switcher.innerHTML=`<a href="/demos/factory" ${city?'':'aria-current="page"'}>Factory</a><a href="/demos/city" ${city?'aria-current="page"':''}>City</a><span>3D simulation · live video inference</span><button type="button" data-signals>Sources & context</button>`;
- runtime.prepend(switcher);
+ runtime.prepend(switcher);const feed=document.createElement('section');feed.className='environment-feed';feed.dataset.environmentFeed='';feed.setAttribute('aria-label','Public environmental data');feed.textContent='Connecting regional data…';runtime.prepend(feed);import('/environment-feed.js').then(m=>m.connectEnvironment(feed));
  switcher.querySelector('button').onclick=()=>document.querySelector('.uc-header-signals')?.click();
  addEventListener('pi:inspect',e=>window.__operations?.pick(e.detail.id));
  document.getElementById('ucEntity').addEventListener('change',e=>window.__operations?.pick(e.target.value));
