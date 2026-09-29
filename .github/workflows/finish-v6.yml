@@ -1,0 +1,62 @@
+name: Fieldstack final acceptance
+on:
+  push:
+    branches: [fieldstack-finish-v6]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: fieldstack-finish-v6
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/upload-artifact@v4
+        with:
+          name: finish-source
+          retention-days: 7
+          path: |
+            public/room/
+            public/city.html
+            public/studio.html
+            scripts/
+            tests/
+            app/
+            lib/
+            package.json
+            next.config.ts
+            tsconfig.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install and build
+        run: |
+          npm install
+          npm test
+          npm run build
+          npx playwright install --with-deps chromium
+      - name: Start production server
+        run: |
+          npm start > /tmp/finish-app.log 2>&1 &
+          for i in $(seq 1 60); do curl -sf http://localhost:3000/api/health >/dev/null && break || sleep 2; done
+      - name: Verify command and scene geometry
+        run: node tests/finish-presentation.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: finish-presentation
+          retention-days: 7
+          path: test-report/
+      - name: Exercise complete workflows
+        run: node tests/finish-check.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: finish-verification
+          retention-days: 7
+          path: |
+            test-report/
+            /tmp/finish-app.log
