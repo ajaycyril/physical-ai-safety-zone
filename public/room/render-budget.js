@@ -2,8 +2,7 @@ import * as T from 'three';
 import {CityScene} from './city-scene.js';
 import {Facility} from './facility.js';
 import {lanePose} from './city-model.js';
-// Optimize rendering only. No change to controller dynamics, evidence freshness,
-// authority checks or mission timing. Geometry remains visible and inspectable.
+// Rendering is expendable; control, evidence freshness and authority are not.
 function materialKey(m){return JSON.stringify([m.type,m.color?.getHex(),m.emissive?.getHex(),m.emissiveIntensity,m.roughness,m.metalness,m.map?.uuid,m.side,m.transparent,m.opacity,m.depthWrite]);}
 function batchStatic(parent,excluded=new Set()){
  const groups=new Map();parent.updateMatrixWorld(true);
@@ -27,12 +26,31 @@ const district=CityScene.prototype.buildDistrict;CityScene.prototype.buildDistri
 const factory=Facility.prototype.makeScene;Facility.prototype.makeScene=function(){const r=factory.call(this);this.renderBatch=batchStatic(this.scene,new Set([this.gaugeMesh,this.routeZone,this.scanPlane,this.piRing]));budget(this);return r;};
 const cityInit=CityScene.prototype.init;CityScene.prototype.init=async function(){const r=await cityInit.call(this);budget(this);batchStatic(this.fs?.train||new T.Group());return r;};
 function budget(i){
- i.renderer.setPixelRatio(Math.min(devicePixelRatio,1.25));i.resize();i.renderer.shadowMap.autoUpdate=false;i.renderer.shadowMap.needsUpdate=true;i.lastShadow=0;
- for(const light of i.scene.children.filter(o=>o.isLight&&o.shadow))light.shadow.mapSize.set(1024,1024);
- const primary=i.renderer.render.bind(i.renderer);i.renderer.render=function(...args){const now=performance.now();if(!i.lastShadow||now-i.lastShadow>250){i.renderer.shadowMap.needsUpdate=true;i.lastShadow=now;}primary(...args);};
- const feed=i.feedRenderer.render.bind(i.feedRenderer);i.feedRenderer.render=function(...args){const now=performance.now();if(i.lastBudgetFeed&&now-i.lastBudgetFeed<240)return;i.lastBudgetFeed=now;feed(...args);};
- // Keep static distant context in the overview, but exclude it from the small
- // close-up robot/drone camera. The physical area and all controlled bodies stay.
+ const perf={mode:'full',drawMs:0,averageDrawMs:0,rendered:0,skipped:0,pixelRatio:Math.min(devicePixelRatio,1),lastEnd:0,lastFeed:0};
+ i.renderPerformance=perf;window.__renderPerformance=()=>({...perf});
+ i.renderer.setPixelRatio(perf.pixelRatio);i.resize();i.renderer.shadowMap.autoUpdate=false;i.renderer.shadowMap.needsUpdate=true;i.lastShadow=0;
+ for(const light of i.scene.children.filter(o=>o.isLight&&o.shadow))light.shadow.mapSize.set(768,768);
+ function reduceLoad(){
+  if(perf.mode==='perception-priority')return;
+  perf.mode='perception-priority';perf.pixelRatio=Math.min(devicePixelRatio,.65);
+  i.renderer.setPixelRatio(perf.pixelRatio);i.resize();i.renderer.shadowMap.enabled=false;
+  i.scene.traverse(o=>{for(const m of o.material?(Array.isArray(o.material)?o.material:[o.material]):[])m.needsUpdate=true;});
+ }
+ const primary=i.renderer.render.bind(i.renderer);
+ i.renderer.render=function(...args){
+  const now=performance.now();
+  // Leave actual idle time after a costly software-GPU draw. The scene frame
+  // continues to advance fixed-step controllers even when a visual draw is skipped.
+  const idle=perf.mode==='perception-priority'?Math.max(65,Math.min(180,perf.averageDrawMs)):14;
+  if(perf.lastEnd&&now-perf.lastEnd<idle){perf.skipped++;return;}
+  if(i.renderer.shadowMap.enabled&&(!i.lastShadow||now-i.lastShadow>1000)){i.renderer.shadowMap.needsUpdate=true;i.lastShadow=now;}
+  const start=performance.now();primary(...args);const end=performance.now();
+  perf.drawMs=end-start;perf.averageDrawMs=perf.rendered?perf.averageDrawMs*.8+perf.drawMs*.2:perf.drawMs;perf.rendered++;perf.lastEnd=end;
+  if(perf.rendered>2&&(perf.drawMs>80||perf.averageDrawMs>45))reduceLoad();
+ };
+ const feed=i.feedRenderer.render.bind(i.feedRenderer);
+ i.feedRenderer.render=function(...args){const now=performance.now(),interval=perf.mode==='perception-priority'?650:240;if(perf.lastFeed&&now-perf.lastFeed<interval)return;perf.lastFeed=now;feed(...args);};
+ // Static distant context stays in the main view, outside the small sensor camera.
  i.fs?.root.traverse(o=>o.layers.set(1));i.camera.layers.enable(1);
 }
 const colors=[0x91b1d9,0xe7ded0,0x83b6a4,0xaaa7c7,0xc28f99],capacity=160;
@@ -58,5 +76,5 @@ CityScene.prototype.updateVehicles=function(s,dt){
  for(const light of this.lights){const green=s.signal===light.axis&&!s.hazard;light.bulbs.forEach((b,j)=>{const on=j===0?!green:j===2?green:false,color=[0xee677a,0xebc482,0x78e8bc][j];b.material.color.setHex(on?color:0x263444);b.material.emissive.setHex(on?color:0);b.material.emissiveIntensity=on?.8:0;});}
  this.renderCapacity={vehicles:cars.length,capacity,drawGroups:5,source:'Original car-following states'};
 };
-// Render at most 30 fps; physics uses elapsed time at the unchanged fixed step.
+// Fixed-step controller updates remain unchanged. Only redundant visual frames skip.
 for(const[proto,key]of[[CityScene.prototype,'frame'],[Facility.prototype,'animate']]){const original=proto[key];proto[key]=function(now){if(this.disposed)return;if(this.lastBudgetFrame&&now-this.lastBudgetFrame<32){this.raf=requestAnimationFrame(t=>this[key](t));return;}this.lastBudgetFrame=now;return original.call(this,now);};}
