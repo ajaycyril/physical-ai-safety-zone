@@ -50,7 +50,7 @@ function updateModel(dt){const state=snapshot(),physical=city?state?.scene:state
  $('opsWeather').textContent=wx?.weather?.status==='available'?`OMAA · ${wx.weather.temperatureC?.toFixed(1)??'—'}°C · ${wx.weather.windMs?.toFixed(1)??'—'} m/s · ${wx.weather.basis}`:'WEATHER / '+(wx?.weather?.status==='unavailable'?'UNAVAILABLE · GROUND FALLBACK':'CONNECTING');
  $('opsClock').textContent=new Date().toLocaleTimeString('en-GB',{timeZone:'Asia/Dubai'})+' GST';
  inspector();
- for(const a of assets){const c=document.querySelector(`[data-asset="${a.id}"] .asset-alarm`);if(c)c.setAttribute('fill',a.status==='Alarm'?'#d4a15e':'#4b7776');}
+ for(const a of assets){const dot=document.querySelector(`[data-pick="${a.id}"] .ops-dot`);dot?.classList.toggle('alarm',a.status==='Alarm');const c=document.querySelector(`[data-asset="${a.id}"] .asset-alarm`);if(c)c.setAttribute('fill',a.status==='Alarm'?'#d4a15e':'#4b7776');}
  const mover=$('opsFleetMotion');if(mission?.status==='EXECUTING'&&!mission.delegate){const target=get(mission.targets[0]),start=get(mission.resource),t=Math.min(1,mission.elapsed/8),x=start.x+(target.x-start.x)*t,y=start.y+(target.y-start.y)*t;mover.innerHTML=`<g transform="translate(${x} ${y})"><circle r="9" fill="#b5cfca" fill-opacity=".12" stroke="#b5cfca"/><circle r="3" fill="#d6e9e2"/></g>`;}else mover.innerHTML='';
 }
 function build(){
