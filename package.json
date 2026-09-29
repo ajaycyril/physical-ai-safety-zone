@@ -12,7 +12,8 @@
     "test": "node --test tests/*.test.mjs",
     "e2e": "node tests/design-check.mjs && node tests/architecture-check.mjs && node tests/compact-check.mjs && node tests/story-check.mjs",
     "verify": "npm run typecheck && npm test && npm run build",
-    "test:runtime": "node tests/runtime-check.mjs"
+    "test:runtime": "node tests/runtime-check.mjs",
+    "test:guided": "node tests/guided-check.mjs && node tests/polish-check.mjs"
   },
   "dependencies": {
     "next": "latest",

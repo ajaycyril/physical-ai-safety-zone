@@ -77,7 +77,7 @@ function city(i){
  i.scene.fog.density=.008;i.camera.position.set(-30,29,34);i.controls.target.set(0,.6,-2.3);i.camera.far=180;i.camera.updateProjectionMatrix();i.controls.maxDistance=72;
  i.fs.targets={site:[[-30,29,34],[0,.6,-2.3]],process:[[-17,17,19],[0,.6,0]],assembly:[[-7,17,-2],[3,3,-17]]};
 }
-function update(i){const f=i.fs;if(!f)return;const s=i.replay||i.viewOverride||(f.kind==='city'?i.model:i.state),t=s.t||0;f.clock=t;
+function update(i){const f=i.fs;if(!f)return;const s=i.replay||i.viewOverride||(f.kind==='city'?i.model:i.state),t=s.t||0;const frameDt=Math.max(0,Math.min(.12,t-(f.clock||0)));f.clock=t;i.realism?.update(frameDt);
  if(f.kind==='factory'){
   const dt=Math.max(0,Math.min(.1,t-f.lastT));if(t<f.lastT){f.cycle=0;f.pieces=0;}f.lastT=t;f.permit=(i.process?.flow||0)>45&&!i.holds.size;f.cycle+=dt*(f.permit?1:0);f.pieces=Math.floor(f.cycle/7)*2;
   for(let j=0;j<f.arms.length;j++){const a=f.arms[j],v=f.cycle*.6+j*2;a.base.rotation.y=Math.sin(v)*.45;a.shoulder.rotation.z=-.4+Math.sin(v+.6)*.32;a.elbow.rotation.z=-.4+Math.cos(v)*.25;}

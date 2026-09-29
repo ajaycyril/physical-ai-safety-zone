@@ -28,27 +28,36 @@ const factory=Facility.prototype.makeScene;Facility.prototype.makeScene=function
 const cityInit=CityScene.prototype.init;CityScene.prototype.init=async function(){const r=await cityInit.call(this);budget(this);batchStatic(this.fs?.train||new T.Group());return r;};
 function budget(i){
  industrialContext(i,i.model?.projection?"city":"factory");
- const perf={mode:'full',drawMs:0,averageDrawMs:0,rendered:0,skipped:0,pixelRatio:Math.min(devicePixelRatio,1),lastEnd:0,lastFeed:0};
+ const perf={mode:'full',slowFrames:0,fastFrames:0,requestGap:16,lastRequest:0,drawMs:0,averageDrawMs:0,rendered:0,skipped:0,lastStart:0,pixelRatio:Math.min(devicePixelRatio,1.25),lastEnd:0,lastFeed:0};
  i.renderPerformance=perf;window.__renderPerformance=()=>({...perf});
  i.renderer.setPixelRatio(perf.pixelRatio);i.resize();i.renderer.shadowMap.autoUpdate=false;i.renderer.shadowMap.needsUpdate=true;i.lastShadow=0;
  for(const light of i.scene.children.filter(o=>o.isLight&&o.shadow))light.shadow.mapSize.set(768,768);
  function reduceLoad(){
   if(perf.mode==='perception-priority')return;
-  perf.mode='perception-priority';perf.pixelRatio=Math.min(devicePixelRatio,.65);
+  perf.mode='perception-priority';perf.pixelRatio=Math.min(devicePixelRatio,.8);
   i.renderer.setPixelRatio(perf.pixelRatio);i.resize();i.renderer.shadowMap.enabled=false;
   i.scene.traverse(o=>{for(const m of o.material?(Array.isArray(o.material)?o.material:[o.material]):[])m.needsUpdate=true;});
  }
  const primary=i.renderer.render.bind(i.renderer);
  i.renderer.render=function(...args){
   const now=performance.now();
-  // Leave actual idle time after a costly software-GPU draw. The scene frame
-  // continues to advance fixed-step controllers even when a visual draw is skipped.
-  const idle=perf.mode==='perception-priority'?Math.max(65,Math.min(180,perf.averageDrawMs)):14;
-  if(perf.lastEnd&&now-perf.lastEnd<idle){perf.skipped++;return;}
-  if(i.renderer.shadowMap.enabled&&(!i.lastShadow||now-i.lastShadow>1000)){i.renderer.shadowMap.needsUpdate=true;i.lastShadow=now;}
+  if(perf.lastRequest&&now-perf.lastRequest<500)perf.requestGap=perf.requestGap*.9+(now-perf.lastRequest)*.1;
+  perf.lastRequest=now;
+  // Schedule from frame start, avoiding a second delay after the GPU work.
+  // A small idle allowance on software rendering keeps video workers responsive.
+  const interval=perf.mode==='perception-priority'?Math.max(40,Math.min(110,perf.averageDrawMs+10)):16;
+  if(perf.lastStart&&now-perf.lastStart<interval){perf.skipped++;return;}
+  perf.lastStart=now;
+  if(i.renderer.shadowMap.enabled&&(!i.lastShadow||now-i.lastShadow>250)){i.renderer.shadowMap.needsUpdate=true;i.lastShadow=now;}
   const start=performance.now();primary(...args);const end=performance.now();
   perf.drawMs=end-start;perf.averageDrawMs=perf.rendered?perf.averageDrawMs*.8+perf.drawMs*.2:perf.drawMs;perf.rendered++;perf.lastEnd=end;
-  if(perf.rendered>2&&(perf.drawMs>80||perf.averageDrawMs>45))reduceLoad();
+  if(perf.rendered>25){
+   const slow=perf.averageDrawMs>45||perf.requestGap>75;
+   perf.slowFrames=slow?perf.slowFrames+1:Math.max(0,perf.slowFrames-1);
+   if(perf.slowFrames>=8)reduceLoad();
+   perf.fastFrames=perf.requestGap<28&&perf.averageDrawMs<15?perf.fastFrames+1:0;
+   if(perf.mode==='perception-priority'&&perf.fastFrames>=90){perf.mode='balanced';perf.pixelRatio=Math.min(devicePixelRatio,1);i.renderer.setPixelRatio(perf.pixelRatio);i.resize();perf.fastFrames=0;perf.slowFrames=0;}
+  }
  };
  const feed=i.feedRenderer.render.bind(i.feedRenderer);
  i.feedRenderer.render=function(...args){const now=performance.now(),interval=perf.mode==='perception-priority'?650:240;if(perf.lastFeed&&now-perf.lastFeed<interval)return;perf.lastFeed=now;feed(...args);};
@@ -78,5 +87,4 @@ CityScene.prototype.updateVehicles=function(s,dt){
  for(const light of this.lights){const green=s.signal===light.axis&&!s.hazard;light.bulbs.forEach((b,j)=>{const on=j===0?!green:j===2?green:false,color=[0xee677a,0xebc482,0x78e8bc][j];b.material.color.setHex(on?color:0x263444);b.material.emissive.setHex(on?color:0);b.material.emissiveIntensity=on?.8:0;});}
  this.renderCapacity={vehicles:cars.length,capacity,drawGroups:5,source:'Original car-following states'};
 };
-// Fixed-step controller updates remain unchanged. Only redundant visual frames skip.
-for(const[proto,key]of[[CityScene.prototype,'frame'],[Facility.prototype,'animate']]){const original=proto[key];proto[key]=function(now){if(this.disposed)return;if(this.lastBudgetFrame&&now-this.lastBudgetFrame<32){this.raf=requestAnimationFrame(t=>this[key](t));return;}this.lastBudgetFrame=now;return original.call(this,now);};}
+// Controllers and camera interpolation run on every animation frame; only draws are budgeted.

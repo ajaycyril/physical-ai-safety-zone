@@ -7,6 +7,9 @@ let active=null;
 const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
 const clone=v=>v==null?null:JSON.parse(JSON.stringify(v));
 export const renderBridge={
+ presentation(on){if(!active)return;const i=active.instance;i.presentationRate=on?(active.kind==='factory'?1.8:1.25):1;i.presenting=on;i.autoFocus=false;i.actionFocus=null;i.piMotion=false;i.controls.autoRotate=false;if(on){if(active.kind==='city')i.view='overview';else i.cameraMode='overview';}},
+ rate(){return active?.instance.presentationRate||1;},
+
  info(){if(!active)return{};const i=active.instance;return{kind:active.kind,target:clone(i.target),droneTarget:i.droneTarget?.toArray()||null,holds:[...(i.holds||[])],motion:!!i.piMotion};},
  predict(){return active?.kind==='city'?active.instance.model.projection():null;},
  focus(id){if(active)focus(active.instance,active.kind,id);},
@@ -31,7 +34,7 @@ function install(i,kind){
 }
 function update(i,kind,now){
  if(!i.piPins)return;
- if(i.piTransition){const t=Math.min(1,(now-i.piTransition.start)/1100),s=t*t*(3-2*t);i.camera.position.lerpVectors(i.piTransition.from,i.piTransition.to,s);i.controls.target.lerpVectors(i.piTransition.lookFrom,i.piTransition.lookTo,s);if(t>=1)i.piTransition=null;}
+ if(i.piTransition){const t=reduced?1:Math.min(1,(now-i.piTransition.start)/1600),s=t*t*(3-2*t);i.camera.position.lerpVectors(i.piTransition.from,i.piTransition.to,s);i.controls.target.lerpVectors(i.piTransition.lookFrom,i.piTransition.lookTo,s);if(t>=1)i.piTransition=null;}
  const overview=kind==='city'?i.view==='overview':i.cameraMode==='overview';i.controls.autoRotate=overview&&i.piMotion&&!reduced&&!i.piTransition;
  const p=anchor(i,kind,i.piSelected||(kind==='city'?'J-01':'R-07'));if(kind==='city')i.piRing.position.set(p.x,.075,p.z);else i.piRing.position.set(p.x,p.y,.02);i.piRing.material.color.setHex(i.holds.size?0xe6b87e:kind==='city'?0x95dece:0xc1a8f5);i.piRing.scale.setScalar(1+(reduced?0:.05*Math.sin(now*.002)));
  for(const signal of i.piSignals||[])signal.dots.forEach((d,n)=>{d.visible=!document.body.classList.contains('pi-exploring');d.position.copy(signal.curve.getPoint((now*.00012+n/3)%1));});
@@ -48,7 +51,7 @@ for(const [proto,kind,start,frame]of [[CityScene.prototype,'city','init','frame'
  const label=proto.label;proto.label=function(...args){const s=label.apply(this,args);s.visible=false;return s;};
  const init=proto[start];if(kind==='city')proto[start]=async function(...args){const r=await init.apply(this,args);install(this,kind);return r;};else proto[start]=function(...args){const r=init.apply(this,args);install(this,kind);return r;};
  const originalFrame=proto[frame];proto[frame]=function(now){if(!this.disposed)update(this,kind,now);return originalFrame.call(this,now);};
- const view=proto.setView;proto.setView=function(v,...args){const pos=this.camera.position.clone(),look=this.controls.target.clone();this.piTransition=null;const r=view.call(this,v,...args);if(v==='overview'&&!reduced){this.piTransition={start:performance.now(),from:pos,to:this.camera.position.clone(),lookFrom:look,lookTo:this.controls.target.clone()};this.camera.position.copy(pos);this.controls.target.copy(look);}return r;};
+ const view=proto.setView;proto.setView=function(v,...args){if(this.presenting)return;const pos=this.camera.position.clone(),look=this.controls.target.clone();this.piTransition=null;const r=view.call(this,v,...args);if(v==='overview'&&!reduced){this.piTransition={start:performance.now(),from:pos,to:this.camera.position.clone(),lookFrom:look,lookTo:this.controls.target.clone()};this.camera.position.copy(pos);this.controls.target.copy(look);}return r;};
 }
 // Keep detection annotations inside the video and suppress overlapping labels.
 CityVision.prototype.draw=function(s,w,h){const canvas=s.overlay;canvas.width=w;canvas.height=h;const c=canvas.getContext('2d');c.lineWidth=2.5;c.font='24px sans-serif';const occupied=[];let labels=0;for(const d of [...s.tracks].sort((a,b)=>b.score-a.score)){const b=d.box,color=d.label==='person'?'#f4c88c':'#9deacf';c.strokeStyle=color;c.strokeRect(b.x,b.y,b.w,b.h);if(labels>=2)continue;const text=d.label+' '+Math.round(d.score*100)+'%',tw=c.measureText(text).width+18;const x=Math.max(4,Math.min(w-tw-4,b.x)),y=Math.max(4,Math.min(h-62,b.y<35?b.y+8:b.y-34));const r={x,y,w:tw,h:32};if(occupied.some(q=>r.x<q.x+q.w&&r.x+r.w>q.x&&r.y<q.y+q.h&&r.y+r.h>q.y))continue;c.fillStyle='#0b1520ee';c.fillRect(x,y,tw,32);c.fillStyle=color;c.fillText(text,x+9,y+24);occupied.push(r);labels++;}};

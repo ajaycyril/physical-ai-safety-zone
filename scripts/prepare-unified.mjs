@@ -18,7 +18,7 @@ let f=await fs.readFile('public/room/studio.js','utf8');
 const replace=(a,b)=>{if(f.includes(b))return;if(!f.includes(a))throw Error('Factory integration marker missing: '+a);f=f.replace(a,b);};
 replace("function openDetails(html){$('dialogBody').innerHTML=html;$('detailDialog').showModal();}","function openDetails(html){window.dispatchEvent(new CustomEvent('uc:details',{detail:{html}}));}");
 replace("scope:'V-12:close'","scope:'V-12:close + SB-02:start'");
-replace("event('APPROVAL','V-12 isolation approved for this mission only.'","event('APPROVAL','Duty isolation and standby start approved for this mission only.'");
+if(!f.includes("room.approvalActor"))replace("event('APPROVAL','V-12 isolation approved for this mission only.'","event('APPROVAL','Duty isolation and standby start approved for this mission only.'");
 replace("phase(5,1,'Request physical authority','V-12 close · one mission · explicit approval.'","phase(5,1,'Request scoped recovery','V-12 close + standby start · one mission.'");
 replace("phase(6,5,'Execute the isolation skill'","phase(6,5,'Isolate and restore supply'");
 replace("window.__room={state:","window.__factoryOps={reset,replay:()=>{showEvidence();document.getElementById('replayPlay')?.click();}};window.addEventListener('plant:event',e=>event(e.detail.layer,e.detail.text,e.detail.detail));\nwindow.__room={state:");
