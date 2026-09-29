@@ -174,9 +174,10 @@
         <div class="band-main">
           <div class="band-head"><small>VENDOR-NATIVE CONTROL</small><h3 data-layer-title>Native Fleet Platforms</h3><span class="band-state">EXECUTE</span></div>
           <p class="band-copy">Keep vendor-specific fleet health, route execution, low-latency autonomy and robot lifecycle in the platforms designed to do it.</p>
-          <div class="node-grid cols-3">
+          <div class="node-grid cols-4">
             <button class="arch-node partner-node" data-node="qualcomm"><b>Qualcomm Command Center</b><span>Edge AI · fleet / incident control</span></button>
-            <button class="arch-node partner-node" data-node="alphaz"><b>AlphaZ RMS</b><span>Robot missions · routes · health</span></button>
+            <button class="arch-node partner-node" data-node="formant"><b>Formant</b><span>Telemetry · teleop · fleet operations</span></button>
+            <button class="arch-node partner-node" data-node="alphaz"><b>AlphaZ RMS</b><span>Robot missions · routes · autonomy</span></button>
             <button class="arch-node" data-node="oem"><b>OEM runtimes</b><span>ROS 2 · autopilot · OEM SDKs</span></button>
           </div>
         </div>
@@ -246,6 +247,9 @@
     <p class="section-intro reveal">A credible Physical AI platform is deliberately multi-vendor. The strategic question is not “can we build everything?” It is “which interfaces must remain ours for the network effect to compound?”</p>
   </div>
   <div class="container partner-grid">
+    <a class="partner-card reveal" href="https://docs.formant.io/" target="_blank" rel="noreferrer">
+      <small>ROBOT OPERATIONS</small><h3>Formant</h3><p>Robot-side agent, telemetry, fleet observability, WebRTC teleoperation, commands and APIs for custom robot operations.</p><div><b>PARTNER FOR</b><span>Fleet ops · teleop · observability · robot data plane</span></div><i>↗</i>
+    </a>
     <a class="partner-card reveal" href="https://www.qualcomm.com/news/onq/2026/06/dragonwing-iq10-robotics-reference-design" target="_blank" rel="noreferrer">
       <small>EDGE + ROBOTICS</small><h3>Qualcomm</h3><p>Robotics compute, sensing, ROS 2-oriented software, planning / actuation and command-center patterns.</p><div><b>PARTNER FOR</b><span>Edge compute · runtime · device lifecycle</span></div><i>↗</i>
     </a>
@@ -263,6 +267,50 @@
     </a>
     <article class="partner-card reveal partner-muted">
       <small>ROBOT MANAGEMENT / REFERENCE</small><h3>AlphaZ RMS</h3><p>A robot-management component shown in the e& reference architecture for missions, routes and fleet health.</p><div><b>INTEGRATE AS</b><span>Fleet-native control adapter</span></div><i>•</i>
+    </article>
+  </div>
+
+  <div class="container partner-stack-heading reveal">
+    <span>ARCHITECTURE SNAPSHOTS</span>
+    <h3>Know what each partner actually owns.</h3>
+    <p>These are simplified product-stack views. They are deliberately separated from the Analog control plane so you can explain the integration boundary in an interview.</p>
+  </div>
+
+  <div class="container partner-stacks">
+    <article class="partner-stack-card reveal">
+      <header><small>ROBOT OPS</small><h3>Formant</h3><p>Operations layer around existing robots.</p></header>
+      <div class="mini-stack"><span>Operator UI + fleet views</span><i>↓</i><span>Cloud data backbone + APIs</span><i>↓</i><span>WebRTC teleop + durable commands</span><i>↓</i><span>Formant Agent</span><i>↓</i><span>ROS / non-ROS robot</span></div>
+      <footer><b>ANALOG BOUNDARY</b><p>Keep mission semantics, estate state and policy above Formant.</p></footer>
+    </article>
+    <article class="partner-stack-card reveal">
+      <header><small>AUTONOMY / RMS</small><h3>AlphaZ</h3><p>Reasoning and deployed field-robot autonomy.</p></header>
+      <div class="mini-stack"><span>Mission / task objective</span><i>↓</i><span>Reasoning + planning</span><i>↓</i><span>LiDAR perception + state estimation</span><i>↓</i><span>Local planner / navigation</span><i>↓</i><span>OEM / ROS robot runtime</span></div>
+      <footer><b>EVIDENCE NOTE</b><p>Public RMS detail is limited; this is a synthesis from deployed and research material.</p></footer>
+    </article>
+    <article class="partner-stack-card reveal">
+      <header><small>EDGE + COMMAND</small><h3>Qualcomm</h3><p>Silicon through edge AI and command-center patterns.</p></header>
+      <div class="mini-stack"><span>GenAI / Drone Command Center</span><i>↓</i><span>VMS + mission / flight management</span><i>↓</i><span>ROS 2 + platform services</span><i>↓</i><span>On-device AI runtimes</span><i>↓</i><span>IQ10 / Edge AI compute + sensors</span></div>
+      <footer><b>ANALOG BOUNDARY</b><p>Do not let device-specific command centers become the estate ontology.</p></footer>
+    </article>
+    <article class="partner-stack-card reveal">
+      <header><small>PERCEPTION</small><h3>Levatas</h3><p>Hardware-agnostic industrial visual AI.</p></header>
+      <div class="mini-stack"><span>Alerts / reports / predictive analytics</span><i>↓</i><span>Human-in-loop validation</span><i>↓</i><span>Industrial CV + VLM model library</span><i>↓</i><span>Container runtime: edge / on-prem / private cloud</span><i>↓</i><span>Drone / robot / camera capture</span></div>
+      <footer><b>ANALOG BOUNDARY</b><p>Convert detections into typed World Model observations with provenance.</p></footer>
+    </article>
+    <article class="partner-stack-card reveal">
+      <header><small>ASSET DIGITAL TWIN</small><h3>Optelos</h3><p>Inspection data management and AI-ready asset context.</p></header>
+      <div class="mini-stack"><span>Deliver / collaborate</span><i>↓</i><span>Visualize + measure + compare</span><i>↓</i><span>AI analysis</span><i>↓</i><span>Process digital twin</span><i>↓</i><span>Manage + ingest visual / spatial data</span></div>
+      <footer><b>ANALOG BOUNDARY</b><p>Federate asset identity and evidence into the wider estate graph.</p></footer>
+    </article>
+    <article class="partner-stack-card reveal">
+      <header><small>REALITY CAPTURE</small><h3>Observance</h3><p>Construction physical-state ingestion.</p></header>
+      <div class="mini-stack"><span>Reports + progress + deviations</span><i>↓</i><span>BIM / IFC generation</span><i>↓</i><span>AI 3D + image processing</span><i>↓</i><span>LiDAR + RGB + thermal + IMU fusion</span><i>↓</i><span>LITHIC handheld / drone capture</span></div>
+      <footer><b>ANALOG BOUNDARY</b><p>Treat outputs as spatially grounded observations over time.</p></footer>
+    </article>
+    <article class="partner-stack-card reveal">
+      <header><small>VERTICAL REASONING</small><h3>Kaël</h3><p>Construction project intelligence above site reality.</p></header>
+      <div class="mini-stack"><span>Ranked risk feed + owner / action</span><i>↓</i><span>Impact + risk reasoning</span><i>↓</i><span>Schedule / cost / dependency fusion</span><i>↓</i><span>Registration + physical diff engine</span><i>↓</i><span>Scans + drawings + RFIs + project systems</span></div>
+      <footer><b>ANALOG BOUNDARY</b><p>A vertical analogue for Ana, not the general Physical Intelligence kernel.</p></footer>
     </article>
   </div>
 
