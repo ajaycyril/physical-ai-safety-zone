@@ -10,6 +10,7 @@ const ready=setInterval(()=>{
  switcher.innerHTML=`<a href="/demos/factory" ${city?'':'aria-current="page"'}>Factory</a><a href="/demos/city" ${city?'aria-current="page"':''}>City</a><span>3D simulation · live video inference</span><button type="button" data-signals>Sources & context</button>`;
  runtime.prepend(switcher);
  switcher.querySelector('button').onclick=()=>document.querySelector('.uc-header-signals')?.click();
+ addEventListener('pi:inspect',e=>window.__operations?.pick(e.detail.id));
  document.getElementById('ucEntity').addEventListener('change',e=>window.__operations?.pick(e.target.value));
  const wm=document.getElementById('opsWorldModel');if(wm)inspector.querySelector('header').append(wm);
  // ResizeObserver is authoritative after layout changes and inline inspector switches.
