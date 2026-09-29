@@ -7,7 +7,7 @@
     asset: {
       title: 'Asset anomaly → autonomous inspection',
       copy: 'A predictive signal requests independent evidence. Orchestration selects the right embodiment, dispatches a bounded inspection and closes the loop with verified evidence.',
-      nodes: ['portal','optelos','levatas','anomaly','missiongraph','policy','dispatch','alphaz','ground','sensors'],
+      nodes: ['portal','optelos','levatas','anomaly','missiongraph','policy','dispatch','formant','alphaz','ground','sensors'],
       layers: ['customer','apps','ai','orchestration','native','physical'],
       trace: [
         ['REQUEST','Inspect the at-risk asset'],
@@ -81,7 +81,8 @@
     policy:['GOVERNANCE','Policy + approval','Reasoning proposes. Policy authorizes. High-risk actions are gated by zone, actor, mission class and human approval.',['policy','human-in-loop','fallback']],
     picture:['OPERATIONS','Shared operating picture','Mission progress, robot state, evidence and exceptions remain visible across systems and operators.',['telemetry','exceptions','evidence']],
     qualcomm:['NATIVE PLATFORM','Qualcomm Command Center','Edge and command-center capabilities can handle device / fleet workflows while the orchestration layer remains vendor-neutral.',['edge AI','fleet','robotics']],
-    alphaz:['NATIVE PLATFORM','AlphaZ RMS','Robot-management component shown in the e& reference architecture. Treat it as a fleet-native execution system behind a capability adapter.',['routes','health','missions']],
+    formant:['ROBOT OPERATIONS','Formant','Robot operations and data plane with a robot-side agent, ROS / non-ROS telemetry ingestion, WebRTC teleoperation, fleet observability, commands and developer APIs.',['agent','teleop','fleet','APIs']],
+    alphaz:['ROBOT INTELLIGENCE','AlphaZ RMS','Robot-management / autonomy component shown in the e& reference architecture. Public detail is limited; public AlphaZ material emphasizes reasoning, navigation, planning and reliable field deployments.',['reasoning','navigation','missions']],
     oem:['ROBOT EDGE','OEM runtimes','ROS 2, autopilots and OEM SDKs keep deterministic control and vendor-specific autonomy close to the machine.',['ROS 2','SDK','local safety']],
     drone:['EMBODIMENT','Drone fleet + docks','Aerial sensing with repeatable launch, route, payload, dock and evidence workflows.',['RGB','thermal','LiDAR']],
     ground:['EMBODIMENT','Ground robot fleet','Mobile inspection and patrol bodies with local autonomy, safety envelopes and payload-specific skills.',['inspection','patrol','local autonomy']],
