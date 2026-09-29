@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "../public/site.css";
+import SiteHeader from "./SiteHeader";
 
 export const metadata: Metadata = {
   title: {
-    default: "Physical Intelligence — Product Thesis & Live Robotics Lab",
-    template: "%s | Physical Intelligence",
+    default: "Analog Physical Intelligence",
+    template: "%s | Analog Physical Intelligence",
   },
   description:
     "A working reference architecture for Physical Intelligence: grounded intent, world state, mission orchestration, policy routing, robot-edge safety, browser physics and live camera perception.",
@@ -17,7 +19,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body><SiteHeader />{children}</body>
     </html>
   );
 }

@@ -1,4 +1,5 @@
 import * as T from 'three';
+import {industrialContext} from './industrial-scene.js';
 import {CityScene} from './city-scene.js';
 import {Facility} from './facility.js';
 import {CityVision} from './city-vision.js';
@@ -17,7 +18,7 @@ function anchor(i,kind,id){
 }
 function focus(i,kind,id){const p=anchor(i,kind,id);i.piMotion=false;i.controls.autoRotate=false;i.controls.enabled=true;if(kind==='city')i.view='overview';else{i.cameraMode='overview';i.autoFocus=false;i.actionFocus=null;}i.piTransition={start:performance.now(),from:i.camera.position.clone(),to:p.clone().add(kind==='city'?new T.Vector3(-7,6,8):new T.Vector3(-3.8,-4.2,3)),lookFrom:i.controls.target.clone(),lookTo:p};i.piSelected=id;}
 function install(i,kind){
- active={instance:i,kind};i.piMotion=!reduced;i.controls.autoRotate=!reduced;i.controls.autoRotateSpeed=.16;i.piLastLabels=0;
+ industrialContext(i,kind);active={instance:i,kind};i.piMotion=false;i.controls.autoRotate=false;i.controls.autoRotateSpeed=.16;i.piLastLabels=0;
  i.controls.addEventListener('start',()=>{i.piMotion=false;i.controls.autoRotate=false;i.piTransition=null;});
  const host=i.host;const overlay=document.createElement('div');overlay.className='pi-entity-pins';overlay.setAttribute('aria-label','Inspect scene entities');host.parentElement.append(overlay);i.piPins=[];
  for(const id of kind==='city'?['J-01','D-01','F-01']:['P-204','R-07','V-12']){const b=document.createElement('button');b.type='button';b.className='pi-entity-pin';b.dataset.entity=id;b.setAttribute('aria-label','Inspect '+id);b.innerHTML='<i></i><b>'+id+'</b><span>↗</span>';b.onclick=()=>{focus(i,kind,id);window.dispatchEvent(new CustomEvent('pi:inspect',{detail:{id}}));};overlay.append(b);i.piPins.push({id,b});}

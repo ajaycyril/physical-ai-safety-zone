@@ -1,0 +1,11 @@
+export function beliefFor(a,now=new Date().toISOString()){
+ const observed=a.basis==='RECORDED CV',unknown=!Number.isFinite(a.value)||a.status==='Unknown';
+ return {entityId:a.id,type:a.type,zone:a.zone,frame:'site-schematic-v1',pose:{x:a.x,y:a.y,unit:'diagram-px'},state:{[a.metric]:Number.isFinite(a.value)?a.value:null,unit:a.unit,status:a.status},provenance:{basis:a.basis,source:observed?'decoded-recorded-frames':a.basis==='RUNTIME'?'browser-controller-readback':a.id==='WX-AD'?'regional-weather-adapter':'authored-scenario-model',observedAt:a.observedAt||now,ingestedAt:now},quality:{freshness:unknown?'unknown':'current',ttlSeconds:observed?12:a.id==='WX-AD'?5400:5,confidence:observed?null:undefined,confidenceNote:observed?'Detector score is retained in the source runtime; no calibrated probability inferred.':'Deterministic model; no statistical confidence claimed.'},relationships:a.deps.map(target=>({relation:'depends_on',target})),authority:{scope:'simulation-only',actuation:'explicit-operator-release'},modelVersion:'analog-ops-v1'};
+}
+export function forecast(a,action='hold',seconds=60){
+ if(['camera','drone','robot','vehicle','dock','signal','valve'].includes(a.type)||a.id==='WX-AD')return {error:'No calibrated response model for this entity. Inspect its state and dependencies instead.'};
+ const initial=Number.isFinite(a.value)?a.value:null;if(initial===null)return {error:'No current observation; prediction unavailable.'};
+ const recover=action==='recover',rate=a.type==='junction'?.036:.024,target=recover?Math.min(a.baseline*.72,a.limit*.85):a.resolved?a.baseline*.72:a.baseline;
+ const trajectory=[];for(let t=0;t<=seconds;t+=5){const value=target+(initial-target)*Math.exp(-rate*t);trajectory.push({t,value,uncertainty:Math.abs(value)*(.025+t*.001),limit:a.limit});}
+ return{entityId:a.id,action,horizonSeconds:seconds,model:'bounded-first-order-v1',basis:'SIMULATED PREDICTION',assumptions:['No new external disturbance','Constant operating regime','Authored response coefficient; not learned from site data'],trajectory,violationSeconds:trajectory.slice(1).filter(p=>p.value>a.limit).length*5,cost:trajectory.reduce((v,p)=>v+Math.max(0,p.value-a.limit),0),uncertaintyNote:'Illustrative sensitivity envelope, not a calibrated confidence interval.'};
+}

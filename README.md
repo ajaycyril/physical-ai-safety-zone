@@ -2,7 +2,7 @@
 
 A visual operating stack with two working environments, by Ajay Cyril.
 
-**[Cognitive city](https://next-project-to-show-physical-ai.vercel.app/city.html)** · **[Factory robotics](https://next-project-to-show-physical-ai.vercel.app/studio.html)**
+**[Cognitive city](https://analog-physical-intelligence.vercel.app/city.html)** · **[Factory robotics](https://analog-physical-intelligence.vercel.app/studio.html)**
 
 Run a mission. Watch the active layer, the shared world, the camera evidence and the physical response together. Open Architecture to inspect each layer's input, output and running implementation.
 
@@ -10,7 +10,7 @@ Run a mission. Watch the active layer, the shared world, the camera evidence and
 
 Two self-hosted videos feed EfficientDet Lite0 in a browser worker. Actual object counts and frame timestamps update a shared world graph. The mission service checks evidence freshness and scope. Two clones of the same junction model compare signal policies before a survey drone, human approval and an interlocked signal change. Vehicles accelerate, stop, yield and clear the crossing. A field unit dispatches while the drone returns to its rooftop pad.
 
-The district is **Hyderabad-inspired and illustrative**. The clips are **independent stock footage, not Hyderabad CCTV**. Video counts scale scenario demand; there is no calibrated mapping from image coordinates to the 3D streets. Predictions and traffic outcomes are simulated, not measured city benefits. The drone follows a bounded waypoint controller, not a flight physics model. No infrastructure is connected.
+The district is **Abu Dhabi-inspired and illustrative**. The clips are **independent stock footage, not Abu Dhabi CCTV**. Video counts scale scenario demand; there is no calibrated mapping from image coordinates to the 3D streets. Predictions and traffic outcomes are simulated, not measured city benefits. The drone follows a bounded waypoint controller, not a flight physics model. No infrastructure is connected.
 
 ## Factory robotics
 
@@ -52,3 +52,15 @@ npm run e2e
 The browser workflow tests video decoding, actual detections, mission completion, approval, cancellation, replay, desktop fit and mobile overflow. Screenshots and JSON state reports are saved as a GitHub Actions artifact. HTTP 200 alone is not the acceptance test.
 
 Primary tools: [MuJoCo](https://github.com/google-deepmind/mujoco/tree/main/wasm), [MediaPipe Object Detector](https://ai.google.dev/edge/mediapipe/solutions/vision/object_detector/web_js), [Three.js](https://threejs.org/).
+
+## Analog site structure (September 2026 overhaul)
+
+Canonical sections: `/thesis`, `/operating-stack`, `/world-model`, `/robotics`, `/demos`, `/roadmap`, `/why-ajay`. The root opens Thesis; legacy HTML URLs redirect to their canonical section. Navigation is sourced from `content/navigation.json` for both generated pages and the React shell.
+
+`npm run build` prepares retained runtime/media assets, then runs `scripts/prepare-site.mjs`. Generated `public/pages`, media and vendor files are excluded from Git. Edit page content in the generator, not generated output. The Operating Stack preserves the detailed partner architecture and interactive scenario traces.
+
+The factory and city consoles add authored asset topology, selection, layer controls, bounded natural-language target resolution, scoped release, hold/cancel, modeled recovery verification and JSON evidence export. Core plant/city interventions delegate to the original physics runtime. The World Model inspector exposes entity contracts, dependencies, bounded counterfactuals and a session snapshot timeline.
+
+**Implementation boundary:** this is a production-shaped demonstration, not a production control system. Assets and geography are authored; recorded-camera inference and regional weather retain provenance. No Cosmos model is hosted. No equipment or municipal agency is connected. Shared durable storage, enterprise identity, calibrated models, production messaging and OEM integration are explicit deployment requirements.
+
+Verification: `npm test`, `npm run typecheck`, `npm run build`, `npm run e2e` and `npm run test:runtime`. The latter two require a running site on localhost:3000, or `BASE_URL`, and a Playwright Chromium installation. Reports and screenshots are written to `test-report/`.

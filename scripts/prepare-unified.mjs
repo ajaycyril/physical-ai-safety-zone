@@ -39,5 +39,3 @@ if(!metadata.available&&process.env.SKIP_REMOTE_ASSETS!=='1'){
 if(metadata.available){const bytes=await fs.readFile(dest);metadata.sha256=createHash('sha256').update(bytes).digest('hex');metadata.bytes=bytes.length;}
 await fs.writeFile('public/media/warehouse-manifest.json',JSON.stringify(metadata,null,2));
 console.log('Unified console prepared; loading-bay clip available:',metadata.available);
-
-for(const [p,t] of [['world-models.html','/city.html?inspect=J-01'],['robotics-stack.html','/studio.html?inspect=R-07']])await fs.writeFile('public/'+p,`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="refresh" content="0;url=${t}"><title>Physical Intelligence</title></head><body><a href="${t}">Open the unified console</a></body></html>`);

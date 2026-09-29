@@ -15,3 +15,8 @@ data/
 *.mov
 outputs/
 work/
+.vercel
+public/vendor/
+public/media/
+public/pages/
+test-report/

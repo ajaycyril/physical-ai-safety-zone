@@ -377,7 +377,7 @@ export function SafetyZoneDemo() {
           <pre className="code">{`python edge_agent/safety_zone_agent.py \\
   --source 0 \\
   --zone "160,130 500,110 560,400 120,420" \\
-  --webhook-url "https://next-project-to-show-physical-ai.vercel.app/api/events"`}</pre>
+  --webhook-url "https://analog-physical-intelligence.vercel.app/api/events"`}</pre>
         </section>
       </aside>
     </section>
