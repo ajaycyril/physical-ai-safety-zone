@@ -52,7 +52,7 @@ export function createAssets(city){
  ];
 }
 export function compileIntent(text,assets,selected){
- const q=text.trim().toLowerCase();if(q.length<4)return{error:'Describe an inspection, survey, response or recovery goal.'};
+ const q=text.trim().toLowerCase().replace(/[’‘]/g,"'").replace(/\b(j|p|v|sb|r|f|d)\s*-?\s*(\d{2,3})\b/g,'$1-$2');if(q.length<4)return{error:'Describe an inspection, survey, response or recovery goal.'};
  if(/bypass|ignore.*(safety|policy)|without approval|disable.*(interlock|safety)/i.test(q))return{error:'This request conflicts with the scenario authority policy. Keep interlocks and approval enabled.'};
  const explicit=q.match(/\b(?:j|p|v|sb|tk|cv|cam|r|f|d|m|ahu|comp|mcc|temp|pt|ft|aq|wx|sig|dock|gas)-[a-z0-9-]+\b/g)||[];
  const unknown=explicit.filter(id=>!assets.some(a=>a.id.toLowerCase()===id));if(unknown.length)return{error:'Unknown asset: '+unknown.join(', ')+'. Select an asset from the map or inventory.'};
@@ -65,5 +65,6 @@ export function compileIntent(text,assets,selected){
  const change=/recover|restore|isolate|close|start|dispatch|respond|relieve|reduce|clear|reroute|stabili[sz]e|repair/.test(q);
  if(!readOnly&&!change)return{error:'I could not resolve an action. Try “inspect”, “survey”, “reduce congestion”, “dispatch response”, or “recover” with an asset or district.'};
  const inspectionOnly=/only|do not|don't|no actuation|without actuation|no signal/.test(q)||!change;
+ if(!inspectionOnly&&targets.some(a=>!['junction','pump','motor','equipment','conveyor','valve'].includes(a.type)))return{error:'These targets support inspection only. Choose a controllable pump, valve, process drive or junction for intervention.'};
  return{intent:text,targets:targets.map(a=>a.id),inspectionOnly,action:inspectionOnly?'Inspect & record':targets.some(a=>a.type==='junction')?'Coordinate response':'Restore & verify',steps:['Ground targets','Check dependencies','Route resources',inspectionOnly?'Capture observations':'Request authority',inspectionOnly?'Compare state':'Execute scoped action','Verify & record']};
 }
