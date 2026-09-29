@@ -10,7 +10,7 @@ for(const width of [1440,768,390]){
  for(const path of ['/thesis','/operating-stack?view=eand#stack','/world-model','/robotics','/demos','/roadmap','/why-ajay']){
   assert.equal((await page.goto(base+path)).status(),200);
   assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),`${path} overflow ${width}`);
-  assert.equal(await page.locator('body').evaluate(el=>getComputedStyle(el).backgroundColor),'rgb(247, 247, 242)');
+  assert.equal(await page.locator('body').evaluate(el=>getComputedStyle(el).backgroundColor),'rgb(248, 246, 245)');
  }
  await page.goto(base+'/operating-stack?view=eand#stack');
  assert.equal(await page.locator('#eand-tab').getAttribute('aria-selected'),'true');
