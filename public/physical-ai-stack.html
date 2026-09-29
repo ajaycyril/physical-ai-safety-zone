@@ -51,7 +51,7 @@
       <p class="ops-lede reveal">The real system is not one robot or one model. It is a governed chain from <strong>customer intent → specialist applications → AI perception → mission orchestration → native fleet control → physical action → evidence.</strong></p>
       <div class="ops-hero-actions reveal">
         <a class="primary-action" href="#stack">Explore the stack <span>↓</span></a>
-        <a class="secondary-action" href="#analog-map">Map it to Analog <span>↘</span></a>
+        <a class="secondary-action" href="/operating-stack?view=eand#stack">e& partner stack <span>↗</span></a><a class="secondary-action" href="#analog-map">Map it to Analog <span>↘</span></a>
       </div>
     </div>
     <aside class="ops-hero-console reveal" aria-label="Architecture summary">
@@ -80,6 +80,11 @@
     </div>
   </div>
 
+  <div class="container architecture-tabs" role="tablist" aria-label="Operating architecture views">
+    <button role="tab" id="architecture-tab" aria-controls="architecture-panel" aria-selected="true" data-architecture-tab="architecture">End-to-end architecture</button>
+    <button role="tab" id="eand-tab" aria-controls="eand-panel" aria-selected="false" tabindex="-1" data-architecture-tab="eand">e& stack · partners & capabilities</button>
+  </div>
+  <div id="architecture-panel" role="tabpanel" aria-labelledby="architecture-tab">
   <div class="container scenario-bar reveal" aria-label="Mission scenarios">
     <div><span>PLAY A MISSION</span><small>Watch the relevant layers and evidence path light up.</small></div>
     <div class="scenario-buttons">
@@ -222,6 +227,16 @@
       <li><span>05</span><div><b>VERIFY</b><small>Return thermal / visual evidence</small></div></li>
       <li><span>06</span><div><b>CLOSE</b><small>Update state + work order</small></div></li>
     </ol>
+  </div>
+  </div>
+  <div class="container eand-panel" id="eand-panel" role="tabpanel" aria-labelledby="eand-tab" hidden>
+    <span class="an-kicker">Photo reference / e& autonomous mobility stack</span>
+    <h2>One architecture. Specialist capabilities at every layer.</h2>
+    <p class="eand-intro">The partner placement below follows your photographed stack. Capabilities describe what the diagram assigns to each component; they are not a claim that every integration is deployed or independently verified.</p>
+    <div class="eand-flow" aria-label="Six reference layers"><span>06 · Customer</span><span>05 · Applications</span><span>04 · AI intelligence</span><span>03 · Orchestration</span><span>02 · Native platforms</span><span>01 · Physical fleets</span></div>
+<article class="eand-row"><span>06 / Customer</span><h3>e& Mission Portal + Mission API</h3><p>Request → quote & pay → track → receive. Customer mission intake, status, reports and dashboards.</p><p><small>CONNECTION</small>Mission intent to orchestration; evidence and application reports back to customer.</p></article><article class="eand-row"><span>05 / Applications</span><h3>Qualcomm · QCC VMS</h3><p>Security surveillance, live video, alerts and Data From Sky video analytics as shown.</p><p><small>CONNECTION</small>Consumes live-feed video AI; returns clips and alerts.</p></article><article class="eand-row"><span>05 / Applications</span><h3>Optelos</h3><p>Asset register, digital twin and defect tracking for inspected infrastructure and facilities.</p><p><small>CONNECTION</small>Consumes defects and asset condition; returns asset reports.</p></article><article class="eand-row"><span>05 / Applications</span><h3>Inkers · Observance</h3><p>Construction capture, scan-to-BIM comparison, progress tracking and schedule variance.</p><p><small>CONNECTION</small>Consumes site-capture analysis; supplies progress reports and measured progress to Kael.</p></article><article class="eand-row"><span>05 / Applications</span><h3>Inkers · Kael</h3><p>Construction project intelligence: schedule, risk, delay alerts and reporting.</p><p><small>CONNECTION</small>Combines measured progress with findings and site state; produces project dashboards.</p></article><article class="eand-row"><span>04 / AI intelligence</span><h3>Levatas</h3><p>Processes maps, imagery, LiDAR, live and recorded video. Image classifiers, computer vision, VLA models and anomaly detection are labeled in the reference.</p><p><small>CONNECTION</small>Supplies perception results to applications; detections may trigger missions.</p></article><article class="eand-row"><span>03 / Orchestration</span><h3>Intelligence Orchestration · extended from AlphaZ RMS</h3><p>Cross-fleet missions, event-driven dispatch, task sequencing and a shared operational picture.</p><p><small>CONNECTION</small>Receives mission intent; coordinates robot work and drone dispatch via QCC.</p></article><article class="eand-row"><span>02 / Native platforms</span><h3>Qualcomm Command Center</h3><p>Intent-driven drone fleet management, flight planning, tasking, deconfliction, data collection, streaming and AI hub.</p><p><small>CONNECTION</small>Missions down to drone fleets; telemetry and video up. Orchestration extends over this stack.</p></article><article class="eand-row"><span>02 / Native platforms</span><h3>AlphaZ RMS</h3><p>Robot missions, route management and fleet health. The diagram identifies this as the origin of the orchestration layer.</p><p><small>CONNECTION</small>Missions down to ground robots; telemetry and sensing up.</p></article><article class="eand-row"><span>01 / Physical fleets</span><h3>Drone fleet + docks</h3><p>Dock-based multirotor aircraft with visual, thermal and LiDAR payloads.</p><p><small>CONNECTION</small>Airborne observation and inspection through Qualcomm Command Center.</p></article><article class="eand-row"><span>01 / Physical fleets</span><h3>Ground robot fleet</h3><p>Quadruped and wheeled embodiments for patrol, inspection and facility operations.</p><p><small>CONNECTION</small>Ground execution and sensing through AlphaZ RMS.</p></article><article class="eand-row"><span>Cross-layer / Open API</span><h3>Enterprise and event integrations</h3><p>Fire alarms, camera alerts and scheduled customer jobs appear at the right edge of the photo. Some labels are cropped.</p><p><small>CONNECTION</small>Mission API is the common gateway. Cropped system names and exact interfaces are not reconstructed.</p></article>
+    <aside class="eand-extension"><span class="an-kicker">Additional integration option / not visible in the photo</span><h3>Formant · fleet operations</h3><p>Robot agent, telemetry, observability, remote commands and teleoperation. Position it at the native-platform layer behind the same capability adapter; retain the robot's own safety and control loop. This is an additional architectural option, not a photographed e& component.</p><a href="https://docs.formant.io/" target="_blank" rel="noreferrer">Formant documentation ↗</a></aside>
+    <div class="eand-bridge"><h3>How this connects to the Analog proposal</h3><p><b>Ana</b> grounds customer intent. <b>World Model</b> retains shared state, memory and provenance. <b>Hive</b> coordinates policy, missions and evidence across the partner systems. <b>Robotics</b> supplies capability adapters and bounded execution. These are proposed product responsibilities, separate from the photo's named components.</p><a href="#partners">Explore partner architecture details ↓</a></div>
   </div>
 </section>
 

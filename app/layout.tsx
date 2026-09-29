@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import "../public/site.css";
+import "../public/analog-light.css";
 import SiteHeader from "./SiteHeader";
 
 export const metadata: Metadata = {
