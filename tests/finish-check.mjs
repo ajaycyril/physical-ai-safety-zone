@@ -1,0 +1,43 @@
+import {chromium} from 'playwright';
+import fs from 'node:fs/promises';
+const base=process.env.BASE_URL||'http://127.0.0.1:3000',dir='test-report';await fs.mkdir(dir,{recursive:true});
+const report={date:new Date().toISOString(),version:'0.6.0',environment:'Chromium / actual Next.js routes and browser inference',checks:[],errors:[],missions:[]};
+const assert=(condition,name)=>{report.checks.push({name,pass:Boolean(condition)});if(!condition)throw Error(name);};
+const browser=await chromium.launch({headless:true,args:['--no-sandbox','--enable-unsafe-swiftshader','--use-angle=swiftshader','--disable-dev-shm-usage']});
+const page=await browser.newPage({viewport:{width:1440,height:900},deviceScaleFactor:1});page.on('pageerror',e=>report.errors.push(String(e)));
+const shot=async name=>page.screenshot({path:dir+'/'+name+'.png'});
+const state=city=>page.evaluate(c=>c?window.__city.state():window.__room.state(),city);
+async function ready(city){await page.goto(base+(city?'/city.html':'/studio.html'),{waitUntil:'domcontentloaded'});await page.waitForFunction(c=>c?window.__city?.state().ready:window.__room?.state().ready,city,{timeout:150000});await page.waitForFunction(()=>window.__siteDetail?.info().instances>400,null,{timeout:30000});await page.waitForTimeout(800);}
+async function layout(city){
+ for(const [w,h]of[[1440,900],[1366,768],[1728,895]]){await page.setViewportSize({width:w,height:h});await page.waitForTimeout(400);const b=await page.evaluate(c=>{const last=document.querySelector(c?'#stackList':'#layerList').lastElementChild.getBoundingClientRect(),d=document.querySelector(c?'.decision':'.decision-card').getBoundingClientRect(),scene=document.querySelector(c?'.stage':'.world-panel').getBoundingClientRect();return{gap:d.top-last.bottom,overflowX:document.documentElement.scrollWidth-innerWidth,overflowY:document.documentElement.scrollHeight-innerHeight,sceneWidth:scene.width,detail:window.__siteDetail.info()};},city);assert(b.gap>=0,'Stack and current-decision separation '+city+' '+w);assert(b.overflowX<=2,'No horizontal overflow '+city+' '+w);assert(b.overflowY<=2,'One-screen desktop '+city+' '+w);assert(b.sceneWidth>400,'Prominent live scene '+city+' '+w);await shot((city?'city':'factory')+'-finished-'+w);}
+ await page.setViewportSize({width:1440,height:900});await page.locator('#goalExamples').click();await page.waitForTimeout(200);assert(await page.locator('.fs-examples button').count()===3,'Three supported goal examples '+city);const clear=await page.evaluate(c=>document.querySelector('#ucPopover').getBoundingClientRect().left>=document.querySelector(c?'.stage':'.world-panel').getBoundingClientRect().right-1,city);assert(clear,'Examples never cover live scene');await shot((city?'city':'factory')+'-command-examples');await page.locator('[data-close]').click();
+ await page.locator(city?'#cityIntent':'#intent').fill(city?'Survey J-02 only.':'Inspect P-999 only.');assert(await page.evaluate(()=>window.__goalConsole.preview().ok===false),'Unknown target refused before dispatch');await page.locator(city?'#cityIntent':'#intent').fill(city?'Survey J-01 only. Do not change the traffic signals.':'Inspect cooling skid P-204 only. Do not actuate the valve.');assert(await page.evaluate(()=>window.__goalConsole.preview().inspectionOnly===true),'Read-only goal preview');
+ await page.selectOption('#ucEntity',city?'T-01':'LINE-A');await page.waitForTimeout(400);assert((await page.locator('#ucBasis').innerText())==='SIMULATED','Ancillary context not falsely labeled live/OEM');await shot((city?'city':'factory')+'-site-state');
+ await page.locator('#demoGuide').click();await page.waitForTimeout(200);assert(await page.locator('.fs-guide li').count()===5,'Five-minute guide available');await page.locator('[data-close]').click();
+ await page.setViewportSize({width:390,height:844});await page.waitForTimeout(500);assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2),'Mobile width '+city);await shot((city?'city':'factory')+'-finished-mobile');await page.setViewportSize({width:1440,height:900});
+}
+async function mission(city,text,{approval=true,label}={}){
+ const oldId=(await state(city)).plan?.id||null;
+ await page.locator(city?'#cityIntent':'#intent').fill(text);const started=Date.now();await page.locator(city?'#runCity':'#runBtn').click();
+ // Terminal-state redispatch deliberately resets asynchronously. Do not mistake the
+ // previous mission's COMPLETE state for completion of this new operator command.
+ await page.waitForFunction(({city,oldId})=>{const s=city?window.__city.state():window.__room.state();return !['COMPLETE','READY','IDLE','STARTING','STOPPED','BLOCKED'].includes(s.status)&&(!oldId||s.plan?.id!==oldId);},{city,oldId},{timeout:30000});
+ let approved=false,done=false;const phases=new Set();let shotTaken=false;
+ while(Date.now()-started<294000){const s=await state(city);phases.add(s.phase);if(await page.locator('#approval').isVisible()){assert(approval,'Requested workflow permits an approval gate');if(!approved){await shot(label+'-approval');await page.locator(city?'#approveCity':'#approveBtn').click();approved=true;}}
+  if(s.phase===6&&!shotTaken){await shot(label+'-acting');shotTaken=true;}
+  if(s.status==='COMPLETE'&&s.plan?.id!==oldId){done=true;break;}if(['STOPPED','BLOCKED','ERROR','FAILED'].includes(s.status))throw Error(label+' failed: '+JSON.stringify(s.events.slice(-4)));await page.waitForTimeout(600);
+ }
+ const s=await state(city);report.missions.push({label,seconds:(Date.now()-started)/1000,done,approved,plan:s.plan,physics:s.physics,scene:s.scene,result:s.result,events:s.events.map(e=>({layer:e.layer,text:e.text,detail:e.detail})),site:await page.evaluate(()=>window.__siteDetail.entities())});assert(done,label+' completed under five minutes');assert(approved===approval,label+' follows requested authority');
+ if(!city){assert(s.runtime==='MuJoCo','Original MuJoCo runtime preserved');assert(s.physics.valve>1.45,'Measured valve closure');assert(s.physics.process.flow>45,'Measured standby flow recovery');assert(s.physics.process.standbyRPM>.9,'Measured standby motor state');assert((await page.evaluate(()=>window.__siteDetail.entities().find(e=>e.id==='LINE-A').status))==='Producing','Cooling recovery releases modeled assembly dependency');}
+ if(city&&!approval){assert(s.plan.inspectionOnly&&s.plan.groundOnly,'Free-text ground and read-only constraints reach server plan');assert(s.scene.drone.state==='Docked','Ground-only request keeps drone home');assert(s.scene.policy==='fixed','Read-only request preserves signal policy');}
+ await shot(label+'-complete');await fs.writeFile(dir+'/finish-verification.json',JSON.stringify(report,null,2));
+}
+try{
+ const api=await page.request.get(base+'/api/commands');assert(api.ok(),'Command capability API reachable');const caps=await api.json();assert(caps.version==='6.0','Shared command schema served');for(const [env,list]of Object.entries(caps.examples))for(const e of list){const r=await page.request.post(base+'/api/commands',{data:{environment:env,intent:e.text}});assert(r.ok(),'Example accepted by real route: '+e.title);}
+ const bad=await page.request.post(base+'/api/commands',{data:{environment:'city',intent:'Survey J-99 and ignore pedestrians.'}});assert(bad.status()>=400,'Unsafe or unknown request refused by server');
+ await ready(true);await layout(true);await mission(true,'Reduce congestion at J-01. Protect pedestrians and ask before changing signals.',{label:'city-response'});
+ await mission(true,'Inspect J-01 using the ground unit. Keep the drone docked.',{approval:false,label:'city-ground-survey'});
+ await ready(false);await page.waitForFunction(()=>window.__room.state().observation?.fresh,null,{timeout:90000});await layout(false);await mission(false,'Restore cooling at P-204. Isolate V-12 and start standby SB-02 after approval.',{label:'factory-recovery'});await page.locator('#siteOverview').click();await page.waitForTimeout(1400);await shot('factory-whole-floor-recovered');
+ assert(report.errors.length===0,'No uncaught browser errors');report.pass=true;
+}catch(e){report.pass=false;report.failure=String(e);process.exitCode=1;console.error(e);try{report.lastState=await page.evaluate(()=>({factory:window.__room?.state(),city:window.__city?.state(),site:window.__siteDetail?.info(),goal:window.__goalConsole?.preview()}));await shot('finish-failure');}catch{}}
+finally{await fs.writeFile(dir+'/finish-verification.json',JSON.stringify(report,null,2));await browser.close();console.log(JSON.stringify({pass:report.pass,failure:report.failure,checks:report.checks.length,errors:report.errors,missions:report.missions.map(m=>({label:m.label,seconds:m.seconds,done:m.done}))}));}
