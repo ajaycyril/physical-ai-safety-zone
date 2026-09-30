@@ -4,10 +4,11 @@ import {renderBridge} from './render-upgrade.js';
 const $=id=>document.getElementById(id), city=!!$('cityScene'), kind=city?'city':'factory';
 const esc=s=>String(s??'—').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const memory=new IntelligenceMemory(100);
+const sceneEntities=new Set(['P-204','R-07','V-12','SB-02','J-01','SG-01','D-01','F-01']);
 let selected='mission',worldView='state',follow=true,latest,frozen=null,previousPhase='',selectedEntity=city?'J-01':'P-204',timer,persisted='',saved=[];
 const storageKey='pi-intelligence-episodes-v1:'+kind;
 const previousEpisodes=()=>saved.filter(e=>e.frames.at(-1)?.missionId!==latest?.missionId);
-try{const parsed=JSON.parse(localStorage.getItem(storageKey)||'[]');if(Array.isArray(parsed))saved=parsed.filter(e=>e?.schema==='physical-intelligence-episode/v1'&&Array.isArray(e.frames)).slice(-2);}catch{}
+try{const parsed=JSON.parse(localStorage.getItem(storageKey)||'[]');if(Array.isArray(parsed))saved=parsed.filter(e=>e?.schema==='physical-intelligence-episode/v1'&&Array.isArray(e.frames)&&e.frames.every(f=>f?.world&&f?.agent&&Array.isArray(f.facts)&&Array.isArray(f.events))).slice(-2);}catch{}
 const state=()=>city?window.__city?.state():window.__room?.state();
 const clock=at=>at?new Date(at).toLocaleTimeString('en-GB',{hour12:false}):'Unknown';
 const kv=(key,value)=>`<div class="intel-kv"><span>${esc(key)}</span><b>${esc(value)}</b></div>`;
@@ -49,7 +50,7 @@ function worldContent(frame){
   }
   const entity=frame.facts.find(f=>f.id===selectedEntity)||frame.facts[0];
   return `<div class="intel-source-summary">${badge(frame.world.current+'/'+frame.world.total+' cameras current',frame.world.current<frame.world.total?'amber':'')}${badge('REV '+frame.revision)}</div>${graph(frame)}
-    <div class="intel-entity"><div><b>${esc(entity.id)}</b><span>${esc(entity.label)}</span><strong>${esc(formatValue(entity))}</strong></div><small>${esc(entity.basis)} · ${entity.fresh?'CURRENT':'UNKNOWN / STALE'}${entity.frame!=null?' · FRAME '+entity.frame:''}</small>${entity.ageMs!=null?`<small>Age ${(entity.ageMs/1000).toFixed(1)}s / ${(entity.ttlMs/1000).toFixed(1)}s freshness limit</small>`:''}<button data-intel-focus="${esc(entity.id)}">Locate in scene ↗</button></div>
+    <div class="intel-entity"><div><b>${esc(entity.id)}</b><span>${esc(entity.label)}</span><strong>${esc(formatValue(entity))}</strong></div><small>${esc(entity.basis)} · ${entity.fresh?'CURRENT':'UNKNOWN / STALE'}${entity.frame!=null?' · FRAME '+entity.frame:''}</small>${entity.ageMs!=null?`<small>Age ${(entity.ageMs/1000).toFixed(1)}s / ${(entity.ttlMs/1000).toFixed(1)}s freshness limit</small>`:''}${sceneEntities.has(entity.id)?`<button data-intel-focus="${esc(entity.id)}">Locate in scene ↗</button>`:'<small>Source joined by entity ID; no calibrated 3D pose.</small>'}</div>
     <div class="intel-facts">${frame.facts.filter(f=>f.id!==entity.id).map(f=>`<button data-intel-entity="${esc(f.id)}"><span>${esc(f.id)} <small>${esc(f.label)}</small></span><b class="${f.fresh?'':'intel-unknown'}">${esc(formatValue(f))}</b></button>`).join('')}</div>`;
 }
 
@@ -84,9 +85,11 @@ function render(){
   $('intelGate').hidden=latest.status!=='AWAITING APPROVAL';
   const mode=$('intelMode');mode.textContent=frozen&&selected==='world'&&worldView==='memory'?'REPLAY':latest.held?'HELD':'LIVE';mode.classList.toggle('historical',mode.textContent!=='LIVE');
   $('intelRevision').textContent=`${clock(frame.at)} · rev ${frame.revision}`;
-  const content=$('intelContent'),focused=content.contains(document.activeElement)?document.activeElement:null;
+  const content=$('intelContent'),focused=content.contains(document.activeElement)?document.activeElement:null,oldGraph=content.querySelector('.intel-graph');
   const focusKey=focused?Object.entries(focused.dataset).find(([key])=>['intelEntity','intelFocus','memory','runtimeControl'].includes(key)):null;
   content.innerHTML=selected==='world'?worldContent(frame):selected==='agent'?agentContent(frame):hiveContent(frame);
+  const newGraph=content.querySelector('.intel-graph');
+  if(oldGraph&&newGraph&&oldGraph.outerHTML===newGraph.outerHTML)newGraph.replaceWith(oldGraph);
   if(focusKey){const target=[...content.querySelectorAll('button,[role=button]')].find(b=>b.dataset[focusKey[0]]===focusKey[1]);target?.focus({preventScroll:true});}
 }
 

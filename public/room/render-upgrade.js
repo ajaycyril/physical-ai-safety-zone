@@ -17,7 +17,7 @@ export const renderBridge={
 };
 function anchor(i,kind,id){
  if(kind==='city'){if(id==='D-01')return i.drone.position.clone().add(new T.Vector3(0,.55,0));if(id==='F-01')return i.van.position.clone().add(new T.Vector3(0,1.1,0));return new T.Vector3(0,.8,0);}
- if(id==='R-07')return new T.Vector3(i.state.x,i.state.y,1.2);if(id==='V-12')return new T.Vector3(2.78,.05,1.22);return new T.Vector3(3.05,1.55,2.1);
+ if(id==='R-07')return new T.Vector3(i.state.x,i.state.y,1.2);if(id==='V-12')return new T.Vector3(2.78,.05,1.22);if(id==='SB-02')return new T.Vector3(4.7,-1.6,.9);return new T.Vector3(3.05,1.55,2.1);
 }
 function focus(i,kind,id){const p=anchor(i,kind,id);i.piMotion=false;i.controls.autoRotate=false;i.controls.enabled=true;if(kind==='city')i.view='overview';else{i.cameraMode='overview';i.autoFocus=false;i.actionFocus=null;}i.piTransition={start:performance.now(),from:i.camera.position.clone(),to:p.clone().add(kind==='city'?new T.Vector3(-7,6,8):new T.Vector3(-3.8,-4.2,3)),lookFrom:i.controls.target.clone(),lookTo:p};i.piSelected=id;}
 function install(i,kind){
