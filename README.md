@@ -2,9 +2,21 @@
 
 A visual operating stack with two working environments, by Ajay Cyril.
 
-**[Cognitive city](https://analog-physical-intelligence.vercel.app/city.html)** · **[Factory robotics](https://analog-physical-intelligence.vercel.app/studio.html)**
+**[Cognitive city](https://analog-physical-intelligence.vercel.app/demos/city)** · **[Factory robotics](https://analog-physical-intelligence.vercel.app/demos/factory)**
 
-Run a mission. Watch the active layer, the shared world, the camera evidence and the physical response together. Open Architecture to inspect each layer's input, output and running implementation.
+Play the one-minute guided mission. Watch the problem, world state, decision, coordinated response and verified outcome in one workspace. Explore controls retains manual authority and detailed inspection.
+
+## Live intelligence workspace
+
+The World, Agent and Hive tabs read the same controllers that operate the 3D scenes. Guided mode follows the active layer; selecting a tab keeps that view open. `?layer=world`, `?layer=agent` and `?layer=hive` link directly to each view.
+
+- **World:** current entity values, typed dependencies, camera frame IDs and freshness limits, source-specific provenance, process / traffic counterfactuals and a bounded 100-revision memory. Historical snapshots are labeled and never become current observations.
+- **Agent:** an ANA-equivalent interaction built from the existing bounded mission compiler and diagnostic rules. It shows the actual plan's input frames, policy checks, approval scope and output. Questions query controller facts; no neural-agent endpoint is implied.
+- **Hive:** coordination across the simulated robot, survey vehicle, field unit and infrastructure adapters. Tasks complete from readback, with pause, stop, scoped authority and export connected to the existing state machines.
+
+Two completed or stopped episodes can be retained locally. Export uses the `physical-intelligence-episode/v1` schema. This is browser storage, not shared enterprise persistence. Product correspondences follow [Analog's public overview](https://analog.io/); these are independently implemented demo equivalents.
+
+`npm run test:intelligence` checks both complete missions, live revisions, grounded questions, automatic layer changes, pause/resume, approval lineage, task feedback, prediction, replay and responsive widths. Set `BASE_URL` to the running site (default `http://localhost:3003`). `npm run test:guided` also verifies manual approval contrast and authority.
 
 ## Cognitive city
 

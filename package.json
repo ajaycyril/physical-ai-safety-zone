@@ -6,14 +6,15 @@
   "description": "Physical Intelligence control room with real video inference and live Abu Dhabi context.",
   "scripts": {
     "dev": "node scripts/prepare-studio.mjs && node scripts/prepare-city.mjs && node scripts/prepare-portal.mjs && node scripts/prepare-unified.mjs && node scripts/prepare-abu-dhabi.mjs && node scripts/prepare-finish.mjs && node scripts/prepare-site.mjs && next dev",
-    "build": "node scripts/prepare-studio.mjs && node scripts/prepare-city.mjs && node scripts/prepare-portal.mjs && node scripts/prepare-unified.mjs && node scripts/prepare-abu-dhabi.mjs && node scripts/prepare-finish.mjs && node --check public/room/studio.js && node --check public/room/city-studio.js && node --check public/room/city-scene.js && node --check public/room/city-vision.js && node --check public/room/abu-dhabi.js && node scripts/prepare-site.mjs && next build",
+    "build": "node scripts/prepare-studio.mjs && node scripts/prepare-city.mjs && node scripts/prepare-portal.mjs && node scripts/prepare-unified.mjs && node scripts/prepare-abu-dhabi.mjs && node scripts/prepare-finish.mjs && node --check public/room/studio.js && node --check public/room/city-studio.js && node --check public/room/city-scene.js && node --check public/room/city-vision.js && node --check public/room/abu-dhabi.js && node --check public/room/live-intelligence.js && node --check public/room/live-intelligence-model.js && node scripts/prepare-site.mjs && next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "test": "node --test tests/*.test.mjs",
     "e2e": "node tests/design-check.mjs && node tests/architecture-check.mjs && node tests/compact-check.mjs && node tests/story-check.mjs",
     "verify": "npm run typecheck && npm test && npm run build",
     "test:runtime": "node tests/runtime-check.mjs",
-    "test:guided": "node tests/guided-check.mjs && node tests/polish-check.mjs"
+    "test:guided": "node tests/guided-check.mjs && node tests/polish-check.mjs",
+    "test:intelligence": "node tests/intelligence-check.mjs"
   },
   "dependencies": {
     "next": "latest",
