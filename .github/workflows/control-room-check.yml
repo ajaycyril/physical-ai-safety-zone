@@ -1,9 +1,9 @@
-name: Full control room browser acceptance
+name: Live demo acceptance
 on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: ['app/**', 'public/**', 'tests/**', '.github/workflows/control-room-check.yml', 'scripts/**', 'package.json']
+    paths: ['app/**', 'public/**', 'tests/**', '.github/workflows/control-room-check.yml', 'scripts/**', 'package.json', 'package-lock.json', 'next.config.ts']
 permissions:
   contents: read
 concurrency:
@@ -13,23 +13,35 @@ jobs:
   browser:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    env:
+      BASE_URL: https://physical-ops-lab.vercel.app
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
-      - run: npm install
+          node-version: '24'
+          cache: npm
+      - run: npm ci
       - run: npx playwright install --with-deps chromium
-      - name: Check city and factory execution
+      - name: Wait for this exact production release
         run: |
-          npm run dev > /tmp/app.log 2>&1 &
-          for i in $(seq 1 100); do curl -sf http://localhost:3000/api/health >/dev/null && break || sleep 2; done
-          node tests/city-check.mjs
+          mkdir -p test-report
+          for i in $(seq 1 120); do
+            curl -fsS "$BASE_URL/release.json?check=$GITHUB_SHA" > test-report/release.json || true
+            if node -e 'const fs=require("fs");try {const r=JSON.parse(fs.readFileSync("test-report/release.json"));process.exit(r.commit===process.env.GITHUB_SHA?0:1)} catch {process.exit(1)}'; then exit 0; fi
+            sleep 3
+          done
+          echo 'The expected release is not serving on the neutral production domain.'; exit 1
+      - name: Test public walkthroughs without authentication bypass
+        run: npm run test:interview
+      - name: Verify live controls, evidence export and laptop layout
+        run: node tests/release-controls.mjs
+      - name: Check legacy URL redirects
+        run: |
+          node --input-type=module -e 'const r=await fetch("https://analog-physical-intelligence.vercel.app/demos/factory?mode=step",{redirect:"manual"});if(![301,302,307,308].includes(r.status)||!r.headers.get("location")?.startsWith("https://physical-ops-lab.vercel.app/"))throw Error("Legacy host does not redirect");console.log("Neutral-domain redirect verified");'
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: control-room-browser-report
+          name: live-demo-acceptance
           retention-days: 3
-          path: |
-            test-report/
-            /tmp/app.log
+          path: test-report/
