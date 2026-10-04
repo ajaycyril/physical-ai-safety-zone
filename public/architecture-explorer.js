@@ -1,0 +1,42 @@
+const $=id=>document.getElementById(id),esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let catalog=null;fetch('/architecture-catalog.json').then(r=>r.json()).then(d=>{catalog=d;bindPartners();initReference();initWorld();initRobotics();}).catch(console.error);
+
+function bindPartners(){if(!catalog)return;document.querySelectorAll('[data-partner]').forEach(btn=>{if(btn.dataset.partnerBound)return;btn.dataset.partnerBound='1';btn.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();openPartner(btn.dataset.partner);});});$('partnerClose')?.addEventListener('click',closePartner);}
+function openPartner(key){const p=catalog.partners?.[key],d=catalog.partnerDepth?.[key];if(!p)return;const drawer=$('partnerDrawer');$('partnerRole').textContent=(p.role||'Proposed capability').toUpperCase();$('partnerName').textContent=p.name;$('partnerFit').textContent=p.fit||'';$('partnerPublished').innerHTML=d?.published?.length?'<span>PUBLISHED CAPABILITY</span><ul>'+d.published.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>':'';$('partnerBoundary').textContent=d?.boundary||p.check||'';$('partnerSource').href=p.url;drawer.hidden=false;requestAnimationFrame(()=>drawer.classList.add('open'));}
+function closePartner(){const d=$('partnerDrawer');if(!d)return;d.classList.remove('open');setTimeout(()=>d.hidden=true,180);}
+addEventListener('keydown',e=>{if(e.key==='Escape')closePartner();});
+
+function initReference(){const root=$('referenceBlueprint');if(!root||!catalog)return;let active=0,timer=null;
+ const bands=[...document.querySelectorAll('[data-ref-band]')],rails=[...document.querySelectorAll('[data-ref-layer]')];
+ function stop(){clearInterval(timer);timer=null;$('refPlay').textContent='▶ Play the flow';}
+ function select(i){active=Math.max(0,Math.min(bands.length-1,i));bands.forEach((b,j)=>{b.dataset.active=String(j===active);b.dataset.passed=String(j<active)});rails.forEach((b,j)=>{if(b.dataset.refLayer!=='all')b.dataset.active=String(j===active)});root.style.setProperty('--flow-step',active);$('refStatus').textContent='Layer '+String(active+1).padStart(2,'0')+' / '+bands[active].querySelector('h3').textContent+' · '+bands[active].querySelector('.band-label p').textContent;}
+ rails.forEach(b=>{if(b.dataset.refLayer!=='all')b.onclick=()=>{stop();select(Number(b.dataset.refLayer));bands[active].scrollIntoView({behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth',block:'center'});};});
+ bands.forEach((b,i)=>b.querySelector('.band-label')?.addEventListener('click',()=>{stop();select(i)}));
+ $('refPlay').onclick=()=>{if(timer){stop();return;}if(active>=bands.length-1)select(0);$('refPlay').textContent='Ⅱ Pause flow';timer=setInterval(()=>{if(active>=bands.length-1){stop();$('refStatus').textContent='Loop complete · executor evidence returns to the shared contract bus.';return;}select(active+1);},1250);};
+ $('refReset').onclick=()=>{stop();select(0);};select(0);}
+
+function initWorld(){if(!document.querySelector('.world-stage'))return;let seq=1,fresh=true;
+ const nodeCopy={'P-204':'Duty pump / current belief: low flow + elevated pressure. Root cause still unconfirmed.','V-12':'Isolation valve / currently open. Any close command requires scoped authority and read-back.','SB-02':'Standby supply / available candidate for recovery, pending mission approval.','R-07':'Inspection executor / can navigate, inspect and return evidence within the simulated capability envelope.'};
+ document.querySelectorAll('[data-world-node]').forEach(b=>b.onclick=()=>{$('worldNodeDetail').innerHTML='<span>ENTITY / '+esc(b.dataset.worldNode)+'</span><p>'+esc(nodeCopy[b.dataset.worldNode])+'</p>';document.querySelectorAll('[data-world-node]').forEach(x=>x.dataset.active=String(x===b));});
+ function update(){seq++;$('worldFlowValue').textContent=fresh?'18 L/min cooling flow':'Unknown / source expired';$('worldFlowFresh').textContent=fresh?'OBSERVED · sample '+String(seq).padStart(3,'0'):'STALE · refresh required';document.querySelector('.world-stage').dataset.stale=String(!fresh);$('futureCurrent').textContent=fresh?'18 L/min':'Unknown';$('futureCandidate').textContent='Not evaluated';$('futureDetail').textContent=fresh?'Select Compare futures.':'Prediction held until evidence is refreshed.';}
+ $('freshState').onclick=()=>{fresh=true;update();};$('staleState').onclick=()=>{fresh=false;update();};$('worldPredict').onclick=()=>{if(!fresh){$('futureCandidate').textContent='Held';$('futureDetail').textContent='Cannot compare recovery candidates from expired input.';return;}$('futureCandidate').textContent='58 L/min';$('futureDetail').textContent='Illustrative recovery candidate: isolate duty circuit + start standby. Still requires mission authority.';document.querySelector('.future-panel').classList.add('predicted');};}
+
+function initRobotics(){if(!document.querySelector('.robotics-stage')||!catalog)return;let variant='ground',active=0,timer=null;
+ const labels={ground:'GROUND ROBOT',drone:'DRONE + DOCK',arm:'MANIPULATOR'};
+ function layers(){return catalog.robotLayers[variant];}
+ function stop(){clearInterval(timer);timer=null;$('robotTrace').textContent='▶ Trace one task';}
+ function render(i){active=i;const l=layers()[i];document.querySelectorAll('[data-robot-stack]').forEach(s=>s.hidden=s.dataset.robotStack!==variant);document.querySelectorAll('[data-robot-layer]').forEach(b=>{if(b.closest('[data-robot-stack]').dataset.robotStack===variant)b.dataset.active=String(Number(b.dataset.robotLayer)===i);});$('robotDetailKind').textContent=labels[variant]+' / LAYER '+String(i+1).padStart(2,'0');$('robotDetailTitle').textContent=l.name;$('robotDetailCopy').textContent=l.detail;$('robotDetailInput').textContent=l.input;$('robotDetailOutput').textContent=l.output;$('robotTech').innerHTML=l.tech.map(x=>'<span>'+esc(x)+'</span>').join('');$('robotPartners').innerHTML=l.partners.map(k=>'<button data-partner="'+k+'">'+esc(catalog.partners[k].name)+' · '+esc(catalog.partners[k].role)+' ↗</button>').join('');bindPartners();document.querySelector('#robotSilhouette').className='silhouette '+variant;}
+ document.querySelectorAll('[data-embodiment]').forEach(b=>b.onclick=()=>{stop();variant=b.dataset.embodiment;document.querySelectorAll('[data-embodiment]').forEach(x=>x.setAttribute('aria-selected',String(x===b)));render(0);});
+ document.querySelectorAll('[data-robot-layer]').forEach(b=>b.onclick=()=>{stop();variant=b.closest('[data-robot-stack]').dataset.robotStack;render(Number(b.dataset.robotLayer));});
+ $('robotTrace').onclick=()=>{if(timer){stop();return;}if(active>=5)render(0);$('robotTrace').textContent='Ⅱ Pause trace';timer=setInterval(()=>{if(active>=5){stop();return;}render(active+1);},1200);};render(0);}
+
+const phases=[
+ ['Discover one valuable decision','Identify a funded workflow, the operator and the physical operating envelope.','Asset inventory · task definition · baseline evidence','A named owner accepts the outcome definition and deployment constraints.'],
+ ['Prove the complete loop','Integrate one executor and one workflow; retain explicit operator authority.','Versioned contracts · cancellation · evidence export · failure replay','Repeated tasks produce attributable evidence; failure paths remain visible and recoverable.'],
+ ['Repeat without rebuilding','Move the same mission to another site or embodiment.','Reusable adapter · site configuration · commissioning playbook','The second deployment needs less custom integration while meeting the same acceptance criteria.'],
+ ['Operate as a service','Productise support, model evaluation and fleet lifecycle management.','Service levels · staged updates · rollback · cost telemetry','Ongoing task quality and service economics support expansion, not only a successful pilot.']
+];
+function roadmap(i){const p=phases[i];$('roadmapDetail').innerHTML='<span class="eyebrow">PHASE '+String(i+1).padStart(2,'0')+'</span><h2>'+esc(p[0])+'</h2><p>'+esc(p[1])+'</p><div><article><h3>DELIVER</h3><p>'+esc(p[2])+'</p></article><article><h3>EXIT GATE</h3><p>'+esc(p[3])+'</p></article></div>';document.querySelectorAll('[data-roadmap]').forEach((b,j)=>b.setAttribute('aria-selected',String(i===j)));document.querySelector('.roadmap-machine')?.style.setProperty('--phase',i);}
+if($('roadmapDetail')){roadmap(0);document.querySelectorAll('[data-roadmap]').forEach(b=>b.onclick=()=>roadmap(Number(b.dataset.roadmap)));}
+
+document.querySelectorAll('[data-integration]').forEach(b=>b.onclick=()=>b.classList.toggle('open'));

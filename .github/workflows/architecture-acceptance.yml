@@ -1,0 +1,63 @@
+name: Architecture and navigation acceptance
+on:
+  push:
+    branches: [architecture-final-20261004, main]
+    paths: ['architecture/**','public/architecture-explorer.*','scripts/prepare-showcase.mjs','.github/workflows/architecture-acceptance.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: architecture-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - name: Build and unit verification
+        if: github.ref_name != 'main'
+        run: npm run verify
+      - run: npx playwright install --with-deps chromium
+      - name: Start preview review
+        if: github.ref_name != 'main'
+        run: |
+          mkdir -p test-report
+          npm start -- --port 3003 > test-report/server.log 2>&1 &
+          for i in $(seq 1 60); do curl -fsS http://localhost:3003/release.json && break || sleep 1; done
+          echo 'BASE_URL=http://localhost:3003' >> "$GITHUB_ENV"
+      - name: Wait for exact public release
+        if: github.ref_name == 'main'
+        run: |
+          mkdir -p test-report
+          for i in $(seq 1 90); do
+            curl -fsS "https://physical-ops-lab.vercel.app/release.json?check=$GITHUB_SHA" -o /tmp/release.json || true
+            if node -e 'process.exit(require("/tmp/release.json").commit===process.env.GITHUB_SHA?0:1)' 2>/dev/null; then break; fi
+            sleep 4
+          done
+          node -e 'if(require("/tmp/release.json").commit!==process.env.GITHUB_SHA)process.exit(1)'
+          cp /tmp/release.json test-report/release.json
+          echo 'BASE_URL=https://physical-ops-lab.vercel.app' >> "$GITHUB_ENV"
+      - name: Verify navigation, architectures and partner details
+        run: node architecture/acceptance.mjs
+      - name: Accepted demo regression
+        if: github.ref_name != 'main'
+        run: npm run test:showcase
+      - name: Browser inspection
+        run: |
+          npx --yes agent-browser open "$BASE_URL/robotics?embodiment=drone"
+          npx --yes agent-browser snapshot -i > test-report/architecture-browser.txt
+          npx --yes agent-browser close
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: architecture-review-${{ github.ref_name }}
+          path: test-report/
+          retention-days: 3
+
+# release review: distinct narrative and motion pass
