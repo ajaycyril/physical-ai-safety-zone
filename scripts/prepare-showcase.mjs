@@ -6,12 +6,12 @@ const css='public/room/showcase.css';let styles=await fs.readFile(css,'utf8');if
 for(const name of ['factory','city']){const p='public/pages/'+name+'.html';let h=await fs.readFile(p,'utf8');const entry=`await import(\"/room/${name==='factory'?'studio':'city-studio'}.js\")`;if(!h.includes('/room/showcase-camera.js')){if(!h.includes(entry))throw Error('Scene import missing: '+name);h=h.replace(entry,'await import(\"/room/showcase-camera.js\");'+entry);}if(!h.includes('/room/showcase.css'))h=h.replace('</head>','<link rel="stylesheet" href="/room/showcase.css"></head>');if(!h.includes('/room/showcase.js'))h=h.replace('</body>','<script type="module" src="/room/showcase.js"></script></body>');await fs.writeFile(p,h);}
 const test='tests/showcase-check.mjs';let t=await fs.readFile(test,'utf8');t=t.replace('e.b<=innerHeight+1','e.b<=769');await fs.writeFile(test,t);
 const r=JSON.parse(await fs.readFile('public/release.json','utf8'));r.release='2026-10-04.5';r.features=['clean-live-presentation','state-grounded-agent','unobscured-scene','three-live-summaries','executor-camera-tracking','nonblocking-step-control','explicit-approval','evidence-export'];await fs.writeFile('public/release.json',JSON.stringify(r));console.log('Scene-first live presentation prepared.');
-// Generate the independent architecture pages last; leave both accepted runtimes byte-for-byte unchanged.
 const {createHash}=await import('node:crypto');
 const protectedFiles=['public/pages/factory.html','public/pages/city.html','public/room/showcase.js','public/room/showcase.css','public/room/showcase-camera.js'];
 const hash=async p=>createHash('sha256').update(await fs.readFile(p)).digest('hex');
 const before=await Promise.all(protectedFiles.map(hash));
 await import('../architecture/build.mjs');
+await import('../architecture/final-depth.mjs');
 const after=await Promise.all(protectedFiles.map(hash));
 if(before.some((v,i)=>v!==after[i]))throw Error('Architecture build modified an accepted demo');
 await fs.writeFile('public/demo-integrity.json',JSON.stringify(Object.fromEntries(protectedFiles.map((p,i)=>[p,after[i]]))));
