@@ -16,6 +16,11 @@ jobs:
           node-version: '24'
           cache: npm
       - run: npm ci
+      - name: Dependency advisory report
+        run: |
+          mkdir -p test-report
+          npm audit --json > test-report/npm-audit.json || true
+          node -e 'const a=require("./test-report/npm-audit.json");console.log(JSON.stringify({summary:a.metadata?.vulnerabilities,packages:Object.values(a.vulnerabilities||{}).map(v=>({name:v.name,severity:v.severity,range:v.range,fix:v.fixAvailable,advisories:v.via.filter(x=>typeof x==="object").map(x=>({title:x.title,url:x.url,range:x.range}))}))},null,2));'
       - run: npm run verify
       - run: npx playwright install --with-deps chromium
       - name: Start built application
