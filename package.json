@@ -3,12 +3,12 @@
   "version": "0.8.0",
   "private": true,
   "type": "module",
-  "description": "Independent Physical Ops Lab with evidence-led, step-by-step operations simulations.",
+  "description": "Independent Physical Ops Lab with live evidence-led operations simulations.",
   "scripts": {
     "predev": "node scripts/prepare-performance.mjs && node scripts/prepare-interview.mjs source",
-    "dev": "node scripts/prepare-studio.mjs && node scripts/prepare-city.mjs && node scripts/prepare-portal.mjs && node scripts/prepare-unified.mjs && node scripts/prepare-abu-dhabi.mjs && node scripts/prepare-finish.mjs && node scripts/prepare-site.mjs && node scripts/prepare-interview.mjs output && node scripts/prepare-release.mjs && next dev",
+    "dev": "node scripts/prepare-studio.mjs && node scripts/prepare-city.mjs && node scripts/prepare-portal.mjs && node scripts/prepare-unified.mjs && node scripts/prepare-abu-dhabi.mjs && node scripts/prepare-finish.mjs && node scripts/prepare-site.mjs && node scripts/prepare-interview.mjs output && node scripts/prepare-release.mjs && node scripts/prepare-showcase.mjs && next dev",
     "prebuild": "node scripts/prepare-performance.mjs && node scripts/prepare-interview.mjs source",
-    "build": "node scripts/prepare-studio.mjs && node scripts/prepare-city.mjs && node scripts/prepare-portal.mjs && node scripts/prepare-unified.mjs && node scripts/prepare-abu-dhabi.mjs && node scripts/prepare-finish.mjs && node --check public/room/studio.js && node --check public/room/city-studio.js && node --check public/room/demo-director.js && node --check public/room/walkthrough-content.js && node scripts/prepare-site.mjs && node scripts/prepare-interview.mjs output && node scripts/prepare-release.mjs && next build",
+    "build": "node scripts/prepare-studio.mjs && node scripts/prepare-city.mjs && node scripts/prepare-portal.mjs && node scripts/prepare-unified.mjs && node scripts/prepare-abu-dhabi.mjs && node scripts/prepare-finish.mjs && node --check public/room/studio.js && node --check public/room/city-studio.js && node --check public/room/demo-director.js && node --check public/room/showcase.js && node --check public/room/showcase-camera.js && node scripts/prepare-site.mjs && node scripts/prepare-interview.mjs output && node scripts/prepare-release.mjs && node scripts/prepare-showcase.mjs && next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "test": "node --test tests/*.test.mjs",
@@ -17,23 +17,10 @@
     "test:runtime": "node tests/runtime-check.mjs",
     "test:guided": "node tests/guided-check.mjs && node tests/polish-check.mjs",
     "test:intelligence": "node tests/intelligence-check.mjs",
-    "test:interview": "node tests/interview-walkthrough.mjs"
+    "test:interview": "node tests/interview-walkthrough.mjs",
+    "test:showcase": "node tests/showcase-check.mjs"
   },
-  "dependencies": {
-    "@mediapipe/tasks-vision": "1.0.1",
-    "@mujoco/mujoco": "3.13.0",
-    "next": "16.3.8",
-    "react": "latest",
-    "react-dom": "latest",
-    "three": "0.186.0"
-  },
-  "overrides": { "postcss": "^8.5.10" },
-  "devDependencies": {
-    "@types/node": "latest",
-    "@types/react": "latest",
-    "@types/react-dom": "latest",
-    "@types/three": "0.186.0",
-    "playwright": "^1.60.0",
-    "typescript": "latest"
-  }
+  "dependencies": {"@mediapipe/tasks-vision":"1.0.1","@mujoco/mujoco":"3.13.0","next":"16.3.8","react":"latest","react-dom":"latest","three":"0.186.0"},
+  "overrides": {"postcss":"^8.5.10"},
+  "devDependencies": {"@types/node":"latest","@types/react":"latest","@types/react-dom":"latest","@types/three":"0.186.0","playwright":"^1.60.0","typescript":"latest"}
 }
