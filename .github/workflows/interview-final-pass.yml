@@ -1,0 +1,40 @@
+name: Final walkthrough verification
+on:
+  push:
+    branches: [interview-final-pass-20261004]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  walkthrough:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run verify
+      - run: npx playwright install --with-deps chromium
+      - name: Start built application
+        run: |
+          mkdir -p test-report
+          npm start -- --port 3003 > test-report/server.log 2>&1 &
+          for i in $(seq 1 60); do curl -fsS http://localhost:3003/api/health && break || sleep 1; done
+      - name: Browser snapshot
+        run: |
+          npx --yes agent-browser open http://localhost:3003/demos/factory
+          npx --yes agent-browser snapshot -i > test-report/browser-snapshot.txt
+          npx --yes agent-browser screenshot test-report/first-load.png
+          npx --yes agent-browser close
+      - name: Interactive regression suite
+        run: npm run test:interview
+      - name: Evidence artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: physical-ops-review
+          path: test-report/
+          retention-days: 3
