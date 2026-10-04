@@ -15,17 +15,22 @@ jobs:
         with:
           node-version: '24'
           cache: npm
-      - run: npm ci
-      - name: Dependency advisory report
+      - name: Install reviewed compatible dependency fixes
         run: |
+          npm ci
+          npm install next@16.3.8 --save-exact
+          npm update postcss nanoid baseline-browser-mapping
           mkdir -p test-report
+          cp package.json package-lock.json test-report/
           npm audit --json > test-report/npm-audit.json || true
-          node -e 'const a=require("./test-report/npm-audit.json");console.log(JSON.stringify({summary:a.metadata?.vulnerabilities,packages:Object.values(a.vulnerabilities||{}).map(v=>({name:v.name,severity:v.severity,range:v.range,fix:v.fixAvailable,advisories:v.via.filter(x=>typeof x==="object").map(x=>({title:x.title,url:x.url,range:x.range}))}))},null,2));'
+          node -e 'const a=require("./test-report/npm-audit.json");console.log(JSON.stringify(a.metadata?.vulnerabilities));if(a.metadata?.vulnerabilities?.high||a.metadata?.vulnerabilities?.critical)process.exit(1);'
       - run: npm run verify
+      - name: Reusable build review archive
+        run: |
+          tar --exclude='public/media/*.mp4' --exclude='node_modules' -czf test-report/review-source.tar.gz public scripts app lib content tests package.json package-lock.json next.config.ts
       - run: npx playwright install --with-deps chromium
       - name: Start built application
         run: |
-          mkdir -p test-report
           npm start -- --port 3003 > test-report/server.log 2>&1 &
           for i in $(seq 1 60); do curl -fsS http://localhost:3003/api/health && break || sleep 1; done
       - name: Browser snapshot
