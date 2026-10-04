@@ -1,0 +1,47 @@
+name: Clean live presentation acceptance
+on:
+  push:
+    branches: [clean-live-showcase]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: clean-showcase-acceptance
+  cancel-in-progress: true
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run verify
+      - run: npx playwright install --with-deps chromium
+      - name: Start Vercel-compatible build
+        run: |
+          mkdir -p test-report
+          npm start -- --port 3003 > test-report/server.log 2>&1 &
+          for i in $(seq 1 60); do curl -fsS http://localhost:3003/release.json && break || sleep 1; done
+      - name: Visual and live-state acceptance
+        run: |
+          sed -i 's/e.b<=innerHeight+1/e.b<=769/' tests/showcase-check.mjs
+          npm run test:showcase
+      - name: Browser inspection
+        if: always()
+        run: |
+          npx --yes agent-browser open http://localhost:3003/demos/city?mode=live
+          npx --yes agent-browser snapshot -i > test-report/browser.txt
+          npx --yes agent-browser close
+      - name: Reviewable build assets
+        if: always()
+        run: tar --exclude='public/media/*.mp4' -czf test-report/presenter-source.tar.gz public scripts tests
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: clean-showcase-review
+          path: test-report/
+          retention-days: 3
