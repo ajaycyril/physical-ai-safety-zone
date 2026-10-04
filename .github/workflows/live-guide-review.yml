@@ -1,0 +1,44 @@
+name: Live guide acceptance
+on:
+  push:
+    branches: [live-guide-review-20261004]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: live-guide-review
+  cancel-in-progress: true
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run verify
+      - run: npx playwright install --with-deps chromium
+      - name: Start built application
+        run: |
+          mkdir -p test-report
+          npm start -- --port 3003 > test-report/server.log 2>&1 &
+          for i in $(seq 1 60); do curl -fsS http://localhost:3003/release.json && break || sleep 1; done
+      - name: Live nonmodal walkthroughs
+        run: npm run test:interview
+      - name: Controls and viewport checks
+        run: node tests/release-controls.mjs
+      - name: Browser verification
+        run: |
+          npx --yes agent-browser open http://localhost:3003/demos/factory
+          npx --yes agent-browser snapshot -i > test-report/browser-snapshot.txt
+          npx --yes agent-browser screenshot test-report/initial.png
+          npx --yes agent-browser close
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: live-guide-acceptance
+          path: test-report/
+          retention-days: 3

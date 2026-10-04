@@ -1,0 +1,42 @@
+/* The guide participates in layout. It never dims, blurs or blocks the scene. */
+#walkthroughDialog.walkthrough-dialog{position:relative;inset:auto;box-sizing:border-box;width:100%;max-width:none;max-height:none;margin:0;padding:0;border:0;background:#fbfcfd;box-shadow:none;flex:1 1 0;min-height:0;overflow:auto;overscroll-behavior:contain;border-radius:0;}
+#walkthroughDialog.walkthrough-dialog[open]{display:block;animation:none}
+#walkthroughDialog::backdrop{background:transparent;backdrop-filter:none!important;filter:none!important}
+#demoNarrative:has(#walkthroughDialog[open])>header{display:none}
+#demoNarrative:has(#walkthroughDialog[open])>.demo-narrative-body{height:auto;min-height:0;flex:0 0 auto;padding:9px 12px;gap:7px;border-top:1px solid #d6e0e4;background:#f8fbfc}
+#demoNarrative:has(#walkthroughDialog[open])>.demo-narrative-body>:not(.demo-actions):not(.demo-inspect):not(.demo-stack-link){display:none!important}
+#demoNarrative:has(#walkthroughDialog[open]) .demo-actions{margin:0;gap:5px}
+#demoNarrative:has(#walkthroughDialog[open]) #demoContinue{display:none}
+#walkthroughDialog>header{padding:9px 15px}
+#walkthroughDialog>header span{font-size:10px}
+#walkthroughDialog .walkthrough-body{padding:15px}
+#walkthroughDialog .walkthrough-body h2{font-size:24px;margin:7px 0 8px;line-height:1.15}
+#walkthroughDialog .walkthrough-body>h3{font-size:13px;margin-bottom:13px;line-height:1.45}
+#walkthroughDialog>footer{padding:10px 13px 12px;background:#fbfcfd;border-top:1px solid #d6e0e4}
+#walkthroughDialog>footer p{font-size:11px;margin-bottom:8px}
+#walkthroughDialog>footer button{padding:10px 11px;font-size:11px}
+#walkthroughDialog #walkthroughClose{font-size:21px;width:28px;height:28px}
+.wl-feed{display:flex;justify-content:space-between;gap:8px;align-items:center;padding:8px 0;border-top:1px solid #d4e2e7;color:#39766c;font:9px/1.4 monospace;letter-spacing:.4px}
+#wlRevision{color:#647c88;font-variant-numeric:tabular-nums;white-space:nowrap}
+#walkthroughDialog #wlTitle{font:600 15px/1.4 Arial,sans-serif;color:#244958;margin:5px 0 7px}
+#walkthroughDialog #wlDetail{font:12px/1.6 Arial,sans-serif;color:#526d79;margin:0 0 11px}
+.wl-facts article{padding:9px 0;border-bottom:1px solid #e0e8ec;min-width:0}
+.wl-facts article>div{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.wl-facts article span{font:12px/1.4 Arial,sans-serif;color:#496774}
+.wl-facts article strong{font:600 14px/1.4 Arial,sans-serif;color:#214c5c;font-variant-numeric:tabular-nums;text-align:right}
+.wl-facts article small{display:block;font:8px/1.55 monospace;letter-spacing:.15px;color:#738995;margin-top:4px;overflow-wrap:anywhere}
+.wl-facts [data-fresh=false] strong{color:#956634}
+.wl-links{margin:12px 0;display:grid;gap:6px}
+.wl-links>div{display:flex;gap:7px;align-items:center;flex-wrap:wrap;font:10px/1.4 Arial,sans-serif;color:#647d88}
+.wl-links b{font:10px monospace;color:#345565;background:#edf3f5;padding:3px 5px}
+.wl-prediction{background:#eef4f6;border-left:2px solid #779eac;padding:10px;margin:13px 0}
+.wl-prediction>small{font:8px/1.5 monospace;color:#607d88;display:block;margin-bottom:8px}
+.wl-prediction>div{display:flex;justify-content:space-between;gap:8px;font:12px/1.7 Arial,sans-serif;color:#325a6a}
+.wl-details{border-top:1px solid #dbe5e9;margin-top:13px;padding-top:10px;font:12px/1.5 Arial,sans-serif}
+.wl-details>summary{cursor:pointer;color:#496f80;font-size:11px;line-height:1.5;list-style-position:outside;margin-left:12px}
+#wlEventCount{font-size:9px;color:#78929f;margin-left:5px}
+#walkthroughDialog .wl-details p{font:12px/1.6 Arial,sans-serif;margin:9px 0;color:#566f7b}
+#wlEvents{margin:10px 0 0;padding-left:16px}#wlEvents li{padding:3px 0 7px}#wlEvents small{font:9px monospace;color:#577c89}
+#walkthroughDialog .wl-how .walkthrough-example{margin:12px 0;padding:10px}
+body.demo-guided:has(#walkthroughDialog[open]) .demo-scene-caption{backdrop-filter:none}
+@media(max-width:900px){#demoNarrative:has(#walkthroughDialog[open]){min-height:550px;max-height:820px}#walkthroughDialog{min-height:350px!important}.wl-facts article small{font-size:9px}#walkthroughDialog .walkthrough-body{padding:17px}.wl-facts article span{font-size:13px}}
