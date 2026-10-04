@@ -49,7 +49,7 @@ const pages={
  ['Tata / Sense','Worker and connected-device context: start with the signal and the operational problem, then understand what evidence the user can trust.'],
  ['Airtel / Understand','Scene intelligence and enterprise context: translate sensing capabilities into a useful workflow and a clear value proposition.'],
  ['Hassantuk / Respond','Response-loop thinking: detection only matters when ownership, escalation and closure work under real operational constraints.'],
- ['e& / Coordinate','Working through Physical AI architecture and product boundaries across mission intake, perception, orchestration, vendor platforms, drones and ground robots. The focus is how the seams become a reusable operating product.'],
+ ['Physical AI / Coordinate','Working through indicative Physical AI architecture and product boundaries across mission intake, perception, orchestration, vendor platforms, drones and ground robots. The focus is how the seams become a reusable operating product.'],
  ['Analog / Productize','Bring that experience into trusted world state, governed missions, partner architecture and measurable outcomes. Own the product boundary and deployment repeatability with engineering and operating partners.']])+`<p class="an-note">Experience narrative supplied by Ajay. Partner diagrams describe architectural roles and product synthesis; they do not imply that every integration is built or commercially deployed.</p><p><a href="/roadmap">See the first 90 days →</a></p>`}
 };
 await fs.mkdir('public/pages',{recursive:true});
