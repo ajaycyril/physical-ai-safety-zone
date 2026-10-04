@@ -16,14 +16,15 @@ try{
   assert(!/\b(?:analog|hive)\b/i.test(await page.locator('body').innerText()));
   await page.screenshot({path:`test-report/${kind}-${pace}-ready.png`});
   await page.locator('#demoPlay').click();
-  const started=Date.now(),seen=new Set();let finished=null,reviewTested=false;
+  const started=Date.now(),seen=new Set();let finished=null,reviewTested=false,lastData=null;
   while(Date.now()-started<240000){
-   const data=await page.evaluate(()=>({d:window.__demoDirector.state(),s:(window.__city||window.__room).state()}));
+   const data=await page.evaluate(()=>({d:window.__demoDirector.state(),s:(window.__city||window.__room).state(),popup:!!document.getElementById('walkthroughDialog')?.open}));lastData=data;
    if(data.d.finished){finished=data;break;}
    if(['STOPPED','BLOCKED','ERROR','FAILED'].includes(data.s.status))throw Error(kind+' '+pace+' stopped: '+JSON.stringify(data.s.events.slice(-4)));
-   if(pace==='step'&&await page.locator('#walkthroughDialog').isVisible()){
+   if(pace==='step'&&data.popup){
     const n=data.d.stage;seen.add(n);
-    assert.equal(data.s.paused,true,'A step popup must hold execution');
+    if(!data.s.paused){await fs.writeFile(`test-report/${kind}-unexpected-state.json`,JSON.stringify(data,null,2));await page.screenshot({path:`test-report/${kind}-unexpected-state.png`});}
+    assert.equal(data.s.paused,true,'A step popup must hold execution: '+n);
     await page.waitForTimeout(350);
     assert.equal(await page.evaluate(()=>window.__demoDirector.state().stage),n,'A checkpoint must not silently advance');
     if(n===1&&!reviewTested){
@@ -45,6 +46,7 @@ try{
    }
    await page.waitForTimeout(220);
   }
+  if(!finished)await fs.writeFile(`test-report/${kind}-${pace}-timeout.json`,JSON.stringify(lastData,null,2));
   assert(finished,kind+' '+pace+' timed out');
   assert.equal(finished.s.status,'COMPLETE');assert.equal(finished.d.finished.verified,true,'Result must be verified by feedback');
   if(pace==='step'){assert.deepEqual([...seen].sort(),[0,1,2,3,4,5,6,7]);assert(finished.s.events.some(e=>e.layer==='APPROVAL'&&e.detail?.actor==='operator'));}
