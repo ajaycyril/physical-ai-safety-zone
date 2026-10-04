@@ -59,3 +59,5 @@ jobs:
           name: architecture-review-${{ github.ref_name }}
           path: test-report/
           retention-days: 3
+
+# release review: distinct narrative and motion pass
