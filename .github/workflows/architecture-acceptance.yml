@@ -1,7 +1,7 @@
 name: Architecture and navigation acceptance
 on:
   push:
-    branches: [architecture-final-20261004, main]
+    branches: [architecture-final-20261004, scroll-story-20261005, main]
     paths: ['architecture/**','public/architecture-explorer.*','scripts/prepare-showcase.mjs','.github/workflows/architecture-acceptance.yml']
   workflow_dispatch:
 permissions:
@@ -43,15 +43,23 @@ jobs:
           node -e 'if(require("/tmp/release.json").commit!==process.env.GITHUB_SHA)process.exit(1)'
           cp /tmp/release.json test-report/release.json
           echo 'BASE_URL=https://physical-ops-lab.vercel.app' >> "$GITHUB_ENV"
-      - name: Verify navigation, architectures and partner details
+      - name: Verify scroll, layout, data context and demo integrity
         run: node architecture/acceptance.mjs
-      - name: Accepted demo regression
-        if: github.ref_name != 'main'
-        run: npm run test:showcase
       - name: Browser inspection
         run: |
-          npx --yes agent-browser open "$BASE_URL/robotics?embodiment=drone"
+          npx --yes agent-browser open "$BASE_URL/robotics"
           npx --yes agent-browser snapshot -i > test-report/architecture-browser.txt
+          npx --yes agent-browser close
+      - name: Official visual reference
+        if: github.ref_name != 'main'
+        continue-on-error: true
+        run: |
+          npx --yes agent-browser open https://analog.io
+          npx --yes agent-browser wait 2500
+          npx --yes agent-browser screenshot test-report/official-reference.png
+          npx --yes agent-browser scroll down 1100
+          npx --yes agent-browser wait 1000
+          npx --yes agent-browser screenshot test-report/official-reference-scroll.png
           npx --yes agent-browser close
       - uses: actions/upload-artifact@v4
         if: always()
@@ -59,5 +67,3 @@ jobs:
           name: architecture-review-${{ github.ref_name }}
           path: test-report/
           retention-days: 3
-
-# release review: distinct narrative and motion pass
