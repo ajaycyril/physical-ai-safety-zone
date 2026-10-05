@@ -1,0 +1,61 @@
+name: Context, agent and world model acceptance
+on:
+  push:
+    branches: [context-and-agent-20261005, main]
+    paths: ['architecture/context-*','public/product/context-*','public/product/model-studio.js','scripts/prepare-showcase.mjs','.github/workflows/context-review.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: context-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - name: Build and unit tests
+        if: github.ref_name != 'main'
+        run: npm run verify
+      - run: npx playwright install --with-deps chromium
+      - name: Start built preview
+        if: github.ref_name != 'main'
+        run: |
+          mkdir -p test-report
+          npm start -- --port 3003 > test-report/server.log 2>&1 &
+          for i in $(seq 1 45); do curl -fsS http://localhost:3003/release.json && break || sleep 1; done
+          echo 'BASE_URL=http://localhost:3003' >> "$GITHUB_ENV"
+          echo 'DEMO_BASELINE_URL=https://physical-ops-lab.vercel.app' >> "$GITHUB_ENV"
+      - name: Wait for exact production release
+        if: github.ref_name == 'main'
+        run: |
+          mkdir -p test-report
+          for i in $(seq 1 90); do
+            curl -fsS "https://physical-ops-lab.vercel.app/release.json?sha=$GITHUB_SHA" -o /tmp/release.json || true
+            if node -e 'process.exit(require("/tmp/release.json").commit===process.env.GITHUB_SHA?0:1)' 2>/dev/null; then break; fi
+            sleep 4
+          done
+          node -e 'if(require("/tmp/release.json").commit!==process.env.GITHUB_SHA)process.exit(1)'
+          echo 'BASE_URL=https://physical-ops-lab.vercel.app' >> "$GITHUB_ENV"
+      - name: Check contextual interactions and real camera motion
+        run: node architecture/context-acceptance.mjs
+      - name: Existing page and mesh regression
+        run: node architecture/acceptance.mjs
+      - name: Visual browser inspection
+        run: |
+          npx --yes agent-browser open "$BASE_URL/thesis"
+          npx --yes agent-browser snapshot -i > test-report/context/browser.txt
+          npx --yes agent-browser screenshot test-report/context/browser.png
+          npx --yes agent-browser close
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: context-review-${{ github.ref_name }}
+          path: test-report/
+          retention-days: 3
