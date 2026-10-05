@@ -12,6 +12,7 @@ const hash=async p=>createHash('sha256').update(await fs.readFile(p)).digest('he
 const before=await Promise.all(protectedFiles.map(hash));
 await import('../architecture/build.mjs');
 await import('../architecture/context-pass.mjs');
+await import('../architecture/context-layout.mjs');
 const after=await Promise.all(protectedFiles.map(hash));
 if(before.some((v,i)=>v!==after[i]))throw Error('Architecture build modified an accepted demo');
 await fs.writeFile('public/demo-integrity.json',JSON.stringify(Object.fromEntries(protectedFiles.map((p,i)=>[p,after[i]]))));
