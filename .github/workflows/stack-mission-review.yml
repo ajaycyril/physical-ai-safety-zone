@@ -1,0 +1,52 @@
+name: Stack and mission experience acceptance
+on:
+  push:
+    branches: [stack-and-mission-20261005]
+    paths: ['public/**','architecture/**','scripts/**','tests/**','.github/workflows/stack-mission-review.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: stack-mission-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - id: build
+        run: npm run verify
+      - run: npx playwright install --with-deps chromium
+      - name: Start built site
+        run: |
+          mkdir -p test-report
+          npm start -- --port 3003 > test-report/server.log 2>&1 &
+          for i in $(seq 1 45); do curl -fsS http://localhost:3003/release.json && break || sleep 1; done
+      - name: Full stack and 3D interaction
+        env:
+          BASE_URL: http://localhost:3003
+        run: node architecture/acceptance.mjs
+      - name: Both missions, historical snapshots and signal feedback
+        if: always() && steps.build.outcome == 'success'
+        env:
+          BASE_URL: http://localhost:3003
+        run: npm run test:showcase
+      - name: Browser visual review
+        if: always() && steps.build.outcome == 'success'
+        run: |
+          npx --yes agent-browser open http://localhost:3003/operating-stack
+          npx --yes agent-browser snapshot -i > test-report/architecture-browser.txt
+          npx --yes agent-browser screenshot test-report/architecture-browser.png
+          npx --yes agent-browser close
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: stack-mission-final-review
+          path: test-report/
+          retention-days: 3
