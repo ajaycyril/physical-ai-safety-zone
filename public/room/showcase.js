@@ -1,3 +1,4 @@
+import {missionNarration} from './mission-narrative.mjs';
 import {IntelligenceMemory,answerFromFrame,formatValue} from './live-intelligence-model.js';
 import {compileGoal} from './command-contract.mjs';
 import {stories} from './demo-story.js';
@@ -6,7 +7,7 @@ const raw=()=>city?window.__city?.state():window.__room?.state();
 const ids={input:city?'cityIntent':'intent',pause:city?'pauseCity':'pauseBtn',stop:city?'stopCity':'stopBtn',reset:city?'resetCity':'resetBtn',approve:city?'approveCity':'approveBtn'};
 const esc=v=>String(v??'—').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const set=(id,v)=>{const e=$(id),s=String(v??'—');if(e&&e.textContent!==s)e.textContent=s;};
-const memory=new IntelligenceMemory(200),phaseNames=['Read the signals','Update shared state','Check the request','Choose the plan','Inspect the asset','Request permission','Execute the plan','Verify the outcome'];
+const memory=new IntelligenceMemory(1200),phaseNames=['Read the signals','Update shared state','Check the request','Choose the plan','Inspect the asset','Request permission','Execute the plan','Verify the outcome'];
 const questions=/^(what|why|how|which|who|is\b|are\b|show\b|explain\b|compare\b|forecast\b|tell\b)/i;
 const explanations={world:'Current evidence, attached to the correct assets and their relationships.',mission:'A bounded plan, with dependencies and permission checked before action.',execution:'The local executor acts and returns independent feedback.'};
 let pace=new URL(location.href).searchParams.get('mode')==='step'?'step':new URL(location.href).searchParams.get('mode')==='auto'?'auto':'live';
@@ -31,7 +32,7 @@ function render(){if(!frame||!$('plShowcase'))return;const s=raw(),d=window.__de
  $('plRun').disabled=!s.ready||starting||(!q&&busy);set('plRun',q?'Ask →':busy?'Running…':'Run mission →');$('plPause').disabled=!busy||!!pending||approval;set('plPause',s.paused?'Resume':'Pause');$('plStop').disabled=!busy;
  if(question&&Date.now()-replyAt<25000){reply=answerFromFrame(question,frame,memory.frames[Math.max(0,memory.frames.length-16)]);}else{question='';reply=null;}
  const concise=done?done.title:failed?'Execution is held. Inspect the evidence or reset.':pending?phaseNames[pending.index]+'. The scene and observations remain live.':approval?(city?'Survey complete. Approve the signal plan; pedestrian interlocks remain active.':'Inspection complete. Approve duty isolation and standby supply.'):busy?phaseNames[n]+'. '+frame.agent.decision+'.':city?'Ask about J-01, or coordinate a survey and a safer signal response.':'Inspect the cooling fault, approve recovery, then verify restored supply.';
- set('plReply',issue||reply?.text||concise);$('plReply').title=issue||reply?.text||concise;
+ const commentary=missionNarration(kind,frame,s,done);set('plReply',issue||reply?.text||commentary);$('plReply').title=issue||reply?.text||commentary;
  set('plClock',new Date(frame.at).toLocaleTimeString('en-GB',{hour12:false}));set('plValueA',fmt(city?'J-01':'P-204'));set('plValueB',fmt(city?'SG-01':'FT-02'));
  const cams=frame.facts.filter(f=>f.id.startsWith('CAM-'));set('plFresh',`${cams.filter(f=>f.fresh).length}/${cams.length} camera sources current`);$('plFresh').dataset.fresh=String(cams.every(f=>f.fresh));set('plWorldLink',city?'Cameras → junction → signal controller':'Pump → duty valve → standby circuit');
  const task=frame.tasks.find(t=>['active','waiting','held'].includes(t.state))||frame.tasks.find(t=>t.state==='queued');set('plTask',done?'Outcome recorded':approval?'Permission required':busy?(task?.title||phaseNames[n]):'Ready for a goal');set('plDependency',done?'Every completed step retains its evidence.':task&&busy?task.owner+' · '+task.dependency:'Inspect → approve → act → verify');
