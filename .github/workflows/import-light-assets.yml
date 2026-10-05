@@ -1,0 +1,33 @@
+name: Import light scene assets
+on:
+  push:
+    branches: [light-parallax-final-20261005]
+    paths: ['.github/workflows/import-light-assets.yml']
+permissions:
+  contents: write
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: light-parallax-final-20261005
+      - name: Import verified generated artwork
+        env:
+          ASSET_URL: 'https://sdmntprcentralindia.oaiusercontent.com/files/00000000-a4b8-8208-a184-b4a84ba42f57/raw?se=2026-10-05T02%3A43%3A29Z&sp=r&sv=2026-02-06&sr=b&scid=a40c4e7f-7397-506e-80a4-f3c057b5379b&skoid=f2622f62-3126-45cd-85e0-0bc840c3afdc&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-05T00%3A32%3A16Z&ske=2026-10-06T00%3A32%3A16Z&sks=b&skv=2026-02-06&sig=gkLcVAIHss5nJ/lJV9/QH6XtKDsEhq9CGzKQtDXMHao%3D'
+        run: |
+          curl --fail --location --retry 2 "$ASSET_URL" -o /tmp/light-assets.zip
+          echo '0186a9ea150229fecb795c6a363839ba06ed82eae44ebb94483a03313afbf030  /tmp/light-assets.zip' | sha256sum --check
+          python - <<'PY'
+          import zipfile
+          z=zipfile.ZipFile('/tmp/light-assets.zip')
+          for name in z.namelist():
+              assert name.startswith('public/art/') and '..' not in name and name.endswith('.webp'), name
+          z.extractall('.')
+          PY
+          git config user.name 'Ajay Cyril'
+          git config user.email '58912968+ajaycyril@users.noreply.github.com'
+          git add public/art
+          git commit -m 'Add optimized light 3D artwork for all seven site pages'
+          git push origin HEAD:light-parallax-final-20261005
