@@ -1,0 +1,67 @@
+name: Finish and verify product experience
+on:
+  push:
+    branches: [stack-and-mission-20261005]
+    paths: [.github/workflows/finish-product-layout.yml]
+permissions:
+  contents: write
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply reviewed layout adjustments
+        env:
+          CODE_URL: 'https://sdmntprnznorth.oaiusercontent.com/files/00000000-3f20-820b-80c6-f4404d16b785/raw?se=2026-10-05T05%3A21%3A57Z&sp=r&sv=2026-02-06&sr=b&scid=fc2ed797-10d8-5672-94cd-876b95ebcfbd&skoid=d5627e4c-566b-4761-a954-54993b0ed17b&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-05T01%3A02%3A38Z&ske=2026-10-06T01%3A02%3A38Z&sks=b&skv=2026-02-06&sig=R8tDRWWfzHKvAsTSXvZiiXmjKcEmToTXl8T8ue8I664%3D'
+        run: |
+          curl --fail --location "$CODE_URL" -o /tmp/layout.zip
+          echo '5974ba2c075a24ec513dfb9926f0ace7e5a88cc054dd8adcc56c05db88d6eb6a  /tmp/layout.zip' | sha256sum -c -
+          python - <<'PY'
+          import zipfile
+          allowed={'public/product/engineering-models.js','public/product/model-studio.js','architecture/presentation-repair.mjs','public/product/product-design.css','architecture/acceptance.mjs'}
+          with zipfile.ZipFile('/tmp/layout.zip') as z:
+              assert set(z.namelist())==allowed
+              z.extractall('.')
+          PY
+          git config user.name 'Ajay Cyril'
+          git config user.email '58912968+ajaycyril@users.noreply.github.com'
+          git rm .github/workflows/finish-product-layout.yml
+          git add public/product architecture/presentation-repair.mjs architecture/acceptance.mjs
+          git commit -m 'Refine model framing and remove blank layout regions'
+          git push origin HEAD:stack-and-mission-20261005
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - id: build
+        run: npm run verify
+      - run: npx playwright install --with-deps chromium
+      - name: Start built site
+        run: |
+          mkdir -p test-report
+          npm start -- --port 3003 > test-report/server.log 2>&1 &
+          for i in $(seq 1 45); do curl -fsS http://localhost:3003/release.json && break || sleep 1; done
+      - name: Architecture, models and layout
+        env:
+          BASE_URL: http://localhost:3003
+        run: node architecture/acceptance.mjs
+      - name: Factory and city mission regression
+        if: always() && steps.build.outcome == 'success'
+        env:
+          BASE_URL: http://localhost:3003
+        run: npm run test:showcase
+      - name: Browser visual review
+        if: always() && steps.build.outcome == 'success'
+        run: |
+          npx --yes agent-browser open http://localhost:3003/operating-stack
+          npx --yes agent-browser snapshot -i > test-report/architecture-browser.txt
+          npx --yes agent-browser screenshot test-report/architecture-browser.png
+          npx --yes agent-browser close
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: product-experience-review
+          path: test-report/
+          retention-days: 3
