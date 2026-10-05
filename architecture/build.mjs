@@ -49,5 +49,6 @@ const contracts={
  skill:{capability:'inspect_instrument',executor_id:'R-07',asset_id:'P-204',operating_envelope:{localization:'valid',battery_reserve:'qualified'},inputs:{target_frame:'asset:P-204',evidence:'instrument_reading'},cancel_mode:'hold_then_return',outputs:['observation','status','exception'],runtime_version:'pinned'}
 };
 await fs.writeFile('public/light-catalog.json',JSON.stringify({partners,partnerDepth,reference,referenceModules,nodeRegistry,integrationRail,robotLayers,contracts}));
-const rel=JSON.parse(await fs.readFile('public/release.json','utf8').catch(()=>'{}'));rel.release='2026-10-05.1';rel.name='Physical Ops Lab';rel.features=[...new Set([...(rel.features||[]),'light-rendered-assets','depth-parallax','aligned-architecture-rows','stateful-mission-trace','source-freshness-gate','content-page-rebuild'])];await fs.writeFile('public/release.json',JSON.stringify(rel));
+await (await import('./presentation-repair.mjs')).refineContentPages();
+const rel=JSON.parse(await fs.readFile('public/release.json','utf8').catch(()=>'{}'));rel.release='2026-10-05.3';rel.name='Physical Ops Lab';rel.features=[...new Set([...(rel.features||[]),'light-rendered-assets','depth-parallax','aligned-architecture-rows','stateful-mission-trace','source-freshness-gate','content-page-rebuild','full-stack-visible','mesh-models','mission-commentary','historical-state'])];await fs.writeFile('public/release.json',JSON.stringify(rel));
 console.log('Seven light content pages built. Live demo files were not written.');
